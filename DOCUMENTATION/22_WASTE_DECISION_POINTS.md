@@ -1,129 +1,220 @@
-> **PLAN & STRUCTURE LOCK — v1.0:** This approved scope, stack, repository structure, contracts, ownership map, and delivery plan must not be changed by contributors or AI agents. Work only inside the assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR and team notification.
+> **PLAN & STRUCTURE LOCK — v2.0:** This approved scope, stack, repository structure, contracts, ownership map, truth-tier model, and delivery plan must not be changed by contributors or AI agents. Work only inside assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR, contract/document updates, and team notification.
 
-# Waste Decision, EcoCredit, and Penalty Rules
+# Waste Decision, EcoCredit, and Reviewed Violation Rules
 
-Status: canonical rules baseline v1.0  
-Code owner: AASHU JOSHI  
-Approval owner: PARTH AJMERA  
+Status: canonical rules baseline v2.0
+
+Immutable ruleset: **rules-2.0.0**
+
+Code owner: AASHU JOSHI
+
+Approval owner: PARTH AJMERA
+
 Database/test reviewer: BHUMIKA SINGH RAWAT
+
+Hardware/edge evidence reviewers: KRISHNA PANWAR and ADITYA SILSWAL
 
 ## 1. Non-negotiable policy
 
-Automation has only two business outcomes: `ACCEPTED` or `FLAGGED`. It never declares guilt, deducts points, or creates a penalty. Only an authorized human decision of `VERIFIED_VIOLATION` may create one simulated penalty.
+Automation has only two business outcomes: **ACCEPTED** or **FLAGGED**.
 
-The pure implementation belongs in `packages/rules-engine`. Thresholds are versioned configuration, not frontend, firmware, edge, or API-route constants.
+- A qualifying accepted event appends exactly one **+10** point transaction.
+- Every pending, uncertain, unavailable, mismatched, or environmental-wetting result appends no immediate transaction and displays **0 pending review**.
+- An ordinary category mismatch may append **-10** only after an authorized human records **VERIFIED_VIOLATION**.
+- Severe wet-in-dry may append **-20** only after an authorized human records **VERIFIED_VIOLATION** and the frozen severe evidence conditions are present.
+- ML, firmware, the edge, frontend, and an unreviewed rules result can never create a negative entry.
+- Balances are derived from the append-only ledger. No component directly edits a citizen balance or deletes history.
 
-## 2. Inputs
+These are prototype EcoCredit points, not money, a legal fine, a government bill, or automatic guilt.
 
-The engine receives an immutable normalized snapshot:
+The pure deterministic implementation belongs in **packages/rules-engine**. Thresholds and explanation codes are versioned configuration, not duplicated in frontend, firmware, edge routes, or API handlers.
 
-- `eventId`, declared category, and ruleset version;
-- identifier/session validity;
-- intake/motion confirmation;
-- moisture percentage plus quality/calibration version;
-- weight plus quality/calibration version when present;
-- safety flags;
-- explicit missing/degraded states.
+## 2. Immutable normalized input
 
-Fill level, GPS, vehicle connectivity, and optional ML observations are operational/supporting evidence. They do not decide segregation in v1.
+The engine receives one snapshot containing:
 
-## 3. Demo ruleset
+- eventId, ruleset version, canonical `eventSource`, citizen/session validity, and selected compartment;
+- independently debounced physical triggered compartment from wet IR or dry IR;
+- sensor quality and calibration versions;
+- dry-path moisture percentage when the selected/triggered compartment is DRY;
+- ML processing state, observation source, supported label, mapped category, score, confidence band, model/weights/class-map identity, input hash, and quality;
+- safety flags, timestamps, duplicate/timeout indicators, and explicit missing/degraded states.
 
-The seeded profile is deterministic:
+Fill level and GPS are operational evidence only. They never affect ACCEPTED/FLAGGED, confidence, points, review outcome, or violation severity. Moisture is supporting evidence and never proves a violation by itself.
 
-```json
+Canonical event provenance is `HARDWARE | RECORDED_HARDWARE | SIMULATED | SEEDED`; ML evidence source is `LOCAL_LIVE | RECORDED_ML | SIMULATED | SEEDED`. UI badges are derived as `REAL | RECORDED | SIMULATED | PREVIEW/SEEDED`. Browser input cannot choose any authoritative source. Tier 2 preview fixtures are never passed to this engine or stored.
+
+## 3. Frozen rules-2.0.0 profile
+
+~~~json
 {
-  "version": "rules-1.0.0",
-  "awardPoints": 50,
-  "dryMaximumMoisturePercent": 35,
-  "wetMinimumMoisturePercent": 65,
-  "minimumWeightKg": 0.05,
-  "maximumWeightKg": 50,
-  "requiredQuality": "GOOD",
-  "rejectAlwaysRequiresReview": true
+  "version": "rules-2.0.0",
+  "acceptedPoints": 10,
+  "pendingOrUncertainPoints": 0,
+  "verifiedCategoryMismatchPoints": -10,
+  "verifiedSevereWetInDryPoints": -20,
+  "lowConfidenceUpperExclusive": 0.60,
+  "highConfidenceLowerInclusive": 0.85,
+  "normalMoistureUpperExclusive": 30,
+  "elevatedMoistureUpperInclusive": 45,
+  "highMoistureLowerExclusive": 45,
+  "fillAndGpsAreNonDecisional": true,
+  "negativeRequiresVerifiedViolation": true
 }
-```
+~~~
 
-The moisture values are prototype thresholds, not universal scientific facts. KRISHNA PANWAR must prove that calibrated dry/wet samples are separable before this profile is published. A threshold change creates a new immutable ruleset version; it never rewrites historical decisions.
+Exact bands:
 
-## 4. Evaluation order
+| Signal | Range | Frozen interpretation |
+|---|---:|---|
+| ML confidence | **<0.60** | LOW; uncertain |
+| ML confidence | **>=0.60 and <0.85** | MEDIUM; usable evidence |
+| ML confidence | **>=0.85** | HIGH; stronger evidence, not automatic guilt |
+| Moisture | **<30%** | NORMAL |
+| Moisture | **>=30% and <=45%** | ELEVATED |
+| Moisture | **>45%** | HIGH |
+
+The score is not called a calibrated probability unless a recorded validation study proves that claim. Moisture percentages require a valid calibration record; these hackathon thresholds are not universal scientific facts. Any threshold change creates a new immutable ruleset version and never rewrites historical results.
+
+## 4. Automated evaluation order
 
 First matching rule wins:
 
-| Priority | Condition | Outcome | Explanation code |
-|---:|---|---|---|
-| 1 | Safety/fire signal active | `FLAGGED` and separate safety alert | `SAFETY_HOLD` |
-| 2 | Identifier/session invalid | `FLAGGED` | `IDENTITY_OR_SESSION_INVALID` |
-| 3 | Intake not confirmed | `FLAGGED` | `INTAKE_NOT_CONFIRMED` |
-| 4 | Required reading missing, degraded, out of range, or uncalibrated | `FLAGGED` | `EVIDENCE_INSUFFICIENT` |
-| 5 | Weight outside configured range | `FLAGGED` | `WEIGHT_OUT_OF_RANGE` |
-| 6 | Declared `REJECT` | `FLAGGED` | `REJECT_REQUIRES_REVIEW` |
-| 7 | Declared `DRY` and moisture <= dry maximum | `ACCEPTED` | `DRY_MOISTURE_MATCH` |
-| 8 | Declared `DRY` and moisture > dry maximum | `FLAGGED` | `DRY_MOISTURE_ELEVATED` |
-| 9 | Declared `WET` and moisture >= wet minimum | `ACCEPTED` | `WET_MOISTURE_MATCH` |
-| 10 | Declared `WET` and moisture < wet minimum | `FLAGGED` | `WET_MOISTURE_LOW` |
-| 11 | Any unhandled combination | `FLAGGED` | `UNCLASSIFIED_EVIDENCE` |
+| Priority | Condition | Automated outcome | Immediate ledger | Explanation code |
+|---:|---|---|---:|---|
+| 1 | Safety/fire condition active | FLAGGED plus separate safety alert | 0 | SAFETY_HOLD |
+| 2 | Citizen/session/QR binding invalid or expired | FLAGGED | 0 | IDENTITY_OR_SESSION_INVALID |
+| 3 | No valid debounced compartment trigger | FLAGGED | 0 | INTAKE_NOT_CONFIRMED |
+| 4 | Triggered compartment differs from selected compartment | FLAGGED | 0 | COMPARTMENT_TRIGGER_MISMATCH |
+| 5 | Required non-ML sensor or calibration evidence missing, failed, out of range, or corrupt | FLAGGED | 0 | EVIDENCE_INSUFFICIENT |
+| 6 | ML processing is ML_UNAVAILABLE, late beyond deadline, or observation missing | FLAGGED | 0 | ML_UNAVAILABLE |
+| 7 | Event/ML provenance pairing is not HARDWARE/LOCAL_LIVE, RECORDED_HARDWARE/RECORDED_ML, SIMULATED/SIMULATED, or SEEDED/SEEDED | FLAGGED | 0 | PROVENANCE_MISMATCH |
+| 8 | ML source is RECORDED_ML | FLAGGED for reviewer/fallback disclosure | 0 | RECORDED_ML_REQUIRES_REVIEW |
+| 9 | Label unsupported/UNKNOWN, relevant objects conflict, or score <0.60 | FLAGGED | 0 | ML_UNCERTAIN |
+| 10 | Selected DRY, ML maps WET, and calibrated dry-path moisture >45% | FLAGGED | 0 | SEVERE_WET_IN_DRY_SUSPECTED |
+| 11 | ML mapped category differs from selected compartment | FLAGGED | 0 | CATEGORY_MISMATCH |
+| 12 | Selected DRY, ML maps DRY, and calibrated moisture >45% | FLAGGED | 0 | ENVIRONMENTAL_WETTING_SUSPECTED |
+| 13 | Selected DRY, ML maps DRY with score >=0.60 and calibrated moisture <=45% | ACCEPTED | +10 exactly once | DRY_CATEGORY_MATCH |
+| 14 | Selected WET, ML maps WET with score >=0.60 | ACCEPTED | +10 exactly once | WET_CATEGORY_MATCH |
+| 15 | Any unhandled combination | FLAGGED | 0 | UNCLASSIFIED_EVIDENCE |
 
-The 35–65 gap is deliberately conservative: a wet declaration below 65 and dry declaration above 35 are reviewed. Environmental moisture is therefore never treated as automatic misconduct.
+For a WET event, the dry-path moisture sensor is not required and its absence does not fabricate a wet/dry conclusion. A MEDIUM-confidence category match may be accepted; the confidence band remains visible in the audit snapshot. A HIGH-confidence mismatch still only opens review.
 
-## 5. State and value effects
+SIMULATED events may exercise the same deterministic rules and ledger safeguards only for the fixed fictional demo identity. SEEDED events populate reconciled fictional history. Their records retain their canonical provenance, map to `SIMULATED` or `PREVIEW/SEEDED` UI badges, and are excluded from real-hardware proof and every metric that is not explicitly labelled.
 
-```mermaid
-stateDiagram-v2
-  CAPTURED --> EVALUATING
-  EVALUATING --> ACCEPTED: deterministic match
-  EVALUATING --> FLAGGED: uncertainty/mismatch
-  FLAGGED --> REVIEW_ACCEPTED: human accepts
-  FLAGGED --> VERIFIED_VIOLATION: human confirms
-  VERIFIED_VIOLATION --> PENALIZED: simulated penalty transaction
-  ACCEPTED --> CLOSED: credit recorded
-  REVIEW_ACCEPTED --> CLOSED: credit recorded
-  PENALIZED --> CLOSED: workflow complete
-```
+## 5. Required decision examples
 
-| Transition | Allowed value effect |
-|---|---|
-| `EVALUATING -> ACCEPTED` | Insert one `COLLECTION_REWARD` of +50 points |
-| `FLAGGED -> REVIEW_ACCEPTED` | Insert one `COLLECTION_REWARD` of +50 points |
-| `FLAGGED -> VERIFIED_VIOLATION` | No EcoCredit debit; enable one simulated penalty record |
-| Erroneous prior award | Human-authorized compensating `REVERSAL`; never edit/delete original |
-| Redemption | Separate user-requested `REDEMPTION_DEBIT`; never confused with a penalty |
+| Selected | ML evidence | Moisture | Automated result | Immediate points | Possible reviewed result |
+|---|---|---:|---|---:|---|
+| DRY | supported DRY, >=0.60 | <30% | ACCEPTED | +10 | none |
+| DRY | supported DRY, >=0.60 | 30–45% | ACCEPTED with elevated evidence recorded | +10 | none |
+| WET | supported WET, >=0.60 | not required | ACCEPTED | +10 | none |
+| either | score <0.60, UNKNOWN/conflicting, or ML unavailable | any | FLAGGED | 0 | `REVIEW_ACCEPTED` +10 or `REVIEW_NO_ACTION` 0 |
+| DRY | supported DRY | >45% | FLAGGED: environmental wetting suspected | 0 | `REVIEW_ACCEPTED` +10 or `REVIEW_NO_ACTION` 0 |
+| DRY | supported WET | >45% | FLAGGED: severe wet-in-dry suspected | 0 | verified violation may append -20 |
+| either | supported opposite category | any other valid moisture state | FLAGGED: category mismatch | 0 | verified violation may append -10 |
 
-Negative automatic points such as `-10` or `-20` are forbidden. A penalty is money-denominated simulated civic workflow after review, not a hidden reward-ledger deduction.
+## 6. Human review and value effects
 
-## 6. Idempotency and transactions
+The reviewer sees the original selected/triggered compartment, calibrated sensor evidence, ML provenance and confidence, rule version/hash, explanation codes, event source, duplicate/timeout history, and plain-language context. The reviewer cannot edit evidence.
 
-For a given event and ruleset:
+| Authorized review outcome | Preconditions | Append-only value effect |
+|---|---|---:|
+| REVIEW_ACCEPTED — reward | Reviewer finds compliant evidence | +10 once |
+| REVIEW_NO_ACTION | Evidence remains insufficient but no violation is verified | 0; no ledger row; close case |
+| VERIFIED_VIOLATION — ordinary mismatch | CATEGORY_MISMATCH evidence, reason, actor and authorization recorded | -10 once |
+| VERIFIED_VIOLATION — severe wet-in-dry | DRY selected/triggered, supported WET evidence, calibrated moisture >45%, reason, actor and authorization recorded | -20 once |
+| Human correction of a prior transaction | Authorized correction references original transaction | Compensating reversal; original remains immutable |
 
-1. evaluation returns the same outcome and ordered explanation codes;
-2. one accepted event creates at most one collection reward;
-3. one review case receives at most one terminal review decision;
-4. one verified event creates at most one penalty;
-5. retry returns the stored canonical result;
-6. different content under the same immutable identity returns `IDEMPOTENCY_CONFLICT`.
+A reviewer cannot choose -20 for an ordinary mismatch, cannot create both -10 and -20 for one terminal review, and cannot verify a violation from moisture alone, GPS, fill level, low confidence, UNKNOWN class, camera failure, or model failure.
 
-Event decision plus reward creation occurs in one database transaction. Review decision plus state transition and optional penalty creation also occurs in one database transaction. Application-only checks are insufficient; database constraints enforce uniqueness.
+## 7. Orthogonal state machines
 
-## 7. Optional ML treatment
+### Processing
 
-`MANUAL_COLAB` and `RECORDED_ML` observations are excluded from the automatic ruleset v1. The reviewer may read them as supporting evidence, alongside source/model/confidence provenance. A high-confidence disagreement may be visually emphasized, but software does not change state, revoke a credit, or create a penalty from it.
+~~~text
+DISPOSAL_STARTED
+  -> SENSOR_CAPTURED
+  -> ML_PENDING
+  -> ML_RECEIVED | ML_UNAVAILABLE
+  -> PROCESSING
+  -> SEGREGATION_DECIDED
+  -> POINTS_CALCULATED | REVIEW_REQUIRED
+  -> COMPLETED
 
-## 8. Required tests
+Any stage -> PROCESSING_FAILED
+~~~
+
+### Decision and review
+
+~~~text
+CAPTURED -> EVALUATING -> ACCEPTED | FLAGGED
+FLAGGED -> REVIEW_ACCEPTED | REVIEW_NO_ACTION | VERIFIED_VIOLATION
+VERIFIED_VIOLATION -> PENALIZED
+ACCEPTED | REVIEW_ACCEPTED | REVIEW_NO_ACTION | PENALIZED -> CLOSED
+~~~
+
+`REVIEW_ACCEPTED` appends +10 if absent. `REVIEW_NO_ACTION` appends no ledger row and closes at 0. The review record retains the no-action reason, actor, and evidence snapshot.
+
+### Edge transport
+
+~~~text
+PENDING -> IN_FLIGHT -> ACKED
+IN_FLIGHT -> PENDING | DEAD_LETTER | AUTH_BLOCKED
+AUTH_BLOCKED -> PENDING after credential repair
+~~~
+
+Never place processing or review states in the transport enum.
+
+## 8. Idempotency and transactional integrity
+
+For a given event, evidence hash, and ruleset:
+
+1. Re-evaluation returns the same outcome and ordered explanation codes.
+2. One accepted or `REVIEW_ACCEPTED` event creates at most one +10 reward.
+3. One flagged event receives at most one terminal `REVIEW_ACCEPTED`, `REVIEW_NO_ACTION`, or `VERIFIED_VIOLATION` decision.
+4. One verified event creates exactly one applicable negative entry, never both -10 and -20.
+5. Retry returns the stored canonical result.
+6. Same immutable identity plus different content returns IDEMPOTENCY_CONFLICT and creates an audit/security event.
+7. A compensating reversal is separately authorized, idempotent, and linked to the original; no transaction is updated or deleted.
+
+Automated decision plus optional +10 insertion occurs in one database transaction. Human review, state transition, exactly one optional -10/-20 entry, and audit record occur in one database transaction. Database constraints enforce uniqueness; application checks alone are insufficient.
+
+The ledger snapshot stores event ID, ruleset version/hash, ordered explanation codes, review ID when applicable, signed point amount, actor/source, and timestamps. Historical rows retain the original rules/model/calibration identities.
+
+## 9. Security, fairness, and simulation safeguards
+
+- Only the cloud rules service evaluates business outcomes; firmware, edge and UI never calculate authority-bearing points.
+- Only the verification-officer/admin server path can record VERIFIED_VIOLATION; frontend visibility is not authorization.
+- Event and ML sources are immutable. Import, seed, simulation, and browser input cannot set HARDWARE or LOCAL_LIVE.
+- The developer simulation endpoint is disabled unless DEMO_SIMULATION_ENABLED=true, role-gated, rate-limited, idempotent, audited, and fixed to fictional identities/fixtures.
+- Raw frames, camera URLs, secrets, arbitrary model labels, GPS and fill values are not copied into public explanation text.
+- Citizen explanation states what evidence was available and how to dispute; it never says “AI proved guilt.”
+- Analytics never rank real citizens publicly. The demo leaderboard uses opt-in fictional aliases and excludes undisclosed simulation.
+
+## 10. Required tests
 
 At minimum cover:
 
-- both exact moisture boundaries (35 and 65) and values immediately around them;
-- wet, dry, and reject declarations;
-- missing, degraded, estimated, out-of-range, and uncalibrated readings;
-- no-intake, invalid identity/session, weight boundaries, and safety hold;
-- same input repeated and concurrent duplicate processing;
-- flagged event creates no ledger or penalty row;
-- review-accepted creates the award once;
-- verified violation creates no reward debit and only one simulated penalty;
-- attempted citizen/operator review, direct balance edit, and direct penalty insert are rejected;
-- explanation codes and ruleset hash remain stable in snapshots;
-- every possible normalized input returns a defined result without throwing.
+- confidence 0, just below/at 0.60, just below/at 0.85, 1, non-finite, and out-of-range;
+- moisture just below/at 30 and just below/at/above 45 after calibration;
+- MEDIUM and HIGH matching WET/DRY categories;
+- ordinary mismatch, severe wet-in-dry, and environmental-wetting paths;
+- wet event without dry-path moisture;
+- missing/degraded/failed/uncalibrated evidence, no trigger, cross-compartment trigger, invalid session, safety hold, UNKNOWN and conflicting objects;
+- every valid event/ML provenance pair plus every rejected cross-pair; recorded evidence always remains review-only;
+- camera/model timeout and ML_UNAVAILABLE preserve durable ingest and create 0 immediate points;
+- same input repeated, concurrent duplicate processing, and same identity/different body;
+- accepted and `REVIEW_ACCEPTED` create +10 once; `REVIEW_NO_ACTION` closes at 0 with no ledger row;
+- FLAGGED creates no immediate ledger row and no negative value;
+- ordinary VERIFIED_VIOLATION creates -10 once; severe creates -20 once; neither is possible without human authorization;
+- attempts to choose severe for ordinary mismatch, use moisture alone, create both negative amounts, mutate balance directly, edit evidence, or delete a ledger row are rejected;
+- reversal is additive/idempotent and preserves the original;
+- SIMULATED truth label, fixed identity, metric exclusion, role/env/rate/idempotency/audit controls;
+- explanation order and ruleset hash remain stable for every normalized input.
 
-## 9. Judge-safe explanation
+Property-based testing should assert that every normalized input returns a defined result, automation never emits a negative value, and no human review can exceed the frozen -20 lower outcome for one event.
 
-“The sensors provide evidence, not guilt. Calibrated, matching evidence earns a transparent EcoCredit. Anything incomplete or inconsistent goes to a human reviewer. Even optional computer vision cannot fine a citizen. Every decision and value change is versioned, idempotent, and auditable.”
+## 11. Judge-safe explanation
+
+“The sensors and local model provide versioned evidence, not guilt. A supported category match can earn exactly ten EcoCredits. Anything missing, uncertain, mismatched, or environmentally ambiguous pauses at zero for human review. Only a verified human decision can append minus ten or minus twenty, and every value change is immutable, idempotent, explainable, and disputable.”

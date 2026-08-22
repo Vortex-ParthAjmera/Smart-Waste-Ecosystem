@@ -1,33 +1,38 @@
-> **PLAN & STRUCTURE LOCK — v1.0:** This approved scope, stack, repository structure, contracts, ownership map, and delivery plan must not be changed by contributors or AI agents. Work only inside the assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR and team notification.
+> **PLAN & STRUCTURE LOCK — v2.0:** This approved scope, stack, repository structure, contracts, ownership map, truth-tier model, and delivery plan must not be changed by contributors or AI agents. Work only inside assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR, contract/document updates, and team notification.
 
-# SGV 2.0 Repository Structure and Module Boundaries
+# Repository Structure and Module Boundaries
 
-Status: Approved and frozen  
-Structure version: 1.0  
-Repository: `sgv-2-smart-waste-ecosystem`  
-Applies to: all human contributors, Freebuff, Cursor, and every other coding agent
+Status: approved and frozen
+Structure version: 2.0
+Repository: `Vortex-ParthAjmera/Smart-Waste-Ecosystem`
+Applies to: every contributor, Freebuff, Cursor, and other coding agent
 
 ## 1. Purpose
 
-This document fixes where every part of SGV 2.0 belongs, who owns it, and which dependencies are permitted. The workspace currently contains planning material but no application scaffold, so the first implementation commit must create this structure exactly.
+This tree lets six contributors implement firmware, edge/ML, cloud rules/API, web roles, schema/quality, and governance in parallel without inventing competing folders or contracts. The final Build Doc v4 features are incorporated without creating three frontend deployments or a top-level ML application.
 
-The structure exists to let six first-time collaborators work in parallel without inventing new folders, duplicating business logic, changing interfaces, or producing avoidable merge conflicts.
+No contributor or coding agent may rename, move, add, or delete a top-level path. A necessary change requires the approved process in `00_READ_ME_FIRST.md`.
 
 ## 2. Frozen top-level tree
 
-~~~text
-sgv-2-smart-waste-ecosystem/
+```text
+Smart-Waste-Ecosystem/
 ├── apps/
 │   └── web/
 │       ├── public/
 │       ├── src/
 │       │   ├── app/
+│       │   │   ├── (auth)/
 │       │   │   ├── (citizen)/
-│       │   │   ├── (operator)/
-│       │   │   ├── (admin)/
+│       │   │   ├── (municipal)/
+│       │   │   │   ├── operator/
+│       │   │   │   └── review/
+│       │   │   ├── (developer)/
 │       │   │   └── api/
 │       │   │       └── v1/
 │       │   ├── components/
+│       │   ├── fixtures/
+│       │   │   └── tier2-preview/
 │       │   ├── lib/
 │       │   │   ├── api-client/
 │       │   │   ├── auth/
@@ -44,10 +49,17 @@ sgv-2-smart-waste-ecosystem/
 │       │   ├── auth/
 │       │   ├── contracts/
 │       │   ├── domain/
+│       │   ├── ml/
+│       │   │   ├── capture.py
+│       │   │   ├── inference.py
+│       │   │   ├── class_map.py
+│       │   │   └── manifest.py
 │       │   ├── persistence/
 │       │   ├── services/
 │       │   ├── settings.py
 │       │   └── main.py
+│       ├── models/
+│       │   └── README.md
 │       ├── tests/
 │       ├── pyproject.toml
 │       └── README.md
@@ -70,6 +82,8 @@ sgv-2-smart-waste-ecosystem/
 │   │   ├── openapi/
 │   │   ├── schemas/
 │   │   ├── fixtures/
+│   │   ├── src/
+│   │   │   └── generated/
 │   │   └── README.md
 │   └── rules-engine/
 │       ├── src/
@@ -90,9 +104,15 @@ sgv-2-smart-waste-ecosystem/
 ├── scripts/
 │   ├── setup/
 │   ├── demo/
-│   │   └── ml/
+│   │   ├── ml/
+│   │   │   ├── model-manifest.json
+│   │   │   ├── class-map.json
+│   │   │   └── README.md
+│   │   ├── fixtures/
+│   │   ├── reset/
+│   │   └── seed/
 │   └── verification/
-├── DOCUMENTAION/
+├── DOCUMENTATION/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   ├── workflows/
@@ -104,71 +124,76 @@ sgv-2-smart-waste-ecosystem/
 ├── README.md
 ├── package.json
 └── package-lock.json
-~~~
+```
 
-No additional top-level folder may be created. No listed folder may be moved, renamed, or deleted. Empty folders may initially contain a `.gitkeep` until their scaffold is implemented.
+Rules:
 
-## 3. Top-level responsibilities
+- `services/edge-gateway/models/` contains documentation and ignored runtime artifacts; model binaries are committed only when license and size policy explicitly allow it.
+- `scripts/demo/ml/model-manifest.json` and `class-map.json` are controlled contract-like files; weights hash and class order must match runtime.
+- Tier 2 fixtures exist only under `apps/web/src/fixtures/tier2-preview/` and must never be imported by server routes/domain modules.
+- Empty scaffold directories may temporarily contain `.gitkeep`.
 
-| Path | Purpose | Primary owner | Backup/reviewer |
+## 3. Path responsibilities
+
+| Path | Responsibility | Primary owner | Reviewer/backup |
 |---|---|---|---|
-| `apps/web/src/app/(citizen)/` | Citizen profile, collection history, credits, bills, disputes, privacy-safe tracker | YASHVARDHAN DOBHAL | PARTH AJMERA |
-| `apps/web/src/app/(operator)/` | Operator collection workflow and online fleet/device status | YASHVARDHAN DOBHAL | PARTH AJMERA |
-| `apps/web/src/app/(admin)/` | Municipal dashboard, verification, fleet, rules, ledgers, analytics | YASHVARDHAN DOBHAL | PARTH AJMERA |
-| `apps/web/src/components/` | Reusable accessible UI components | YASHVARDHAN DOBHAL | PARTH AJMERA |
-| `apps/web/src/lib/api-client/` | Typed browser client for approved `/api/v1` endpoints | YASHVARDHAN DOBHAL | AASHU JOSHI |
-| `apps/web/src/app/api/v1/` | Cloud HTTP boundaries, authentication, validation, orchestration | AASHU JOSHI | PARTH AJMERA |
-| `apps/web/src/lib/domain/` | Cloud use cases and transaction orchestration | AASHU JOSHI | PARTH AJMERA |
-| `apps/web/src/lib/auth/` | Server-side role/session checks | AASHU JOSHI | BHUMIKA SINGH RAWAT |
-| `apps/web/src/lib/supabase/` | Scoped server/client database adapters | AASHU JOSHI | BHUMIKA SINGH RAWAT |
-| `packages/rules-engine/` | Pure, deterministic, versioned compliance/reward rules | AASHU JOSHI | PARTH AJMERA |
-| `services/edge-gateway/` | FastAPI LAN ingest, SQLite outbox, retry/sync, health/status | ADITYA SILSWAL | PARTH AJMERA |
-| `firmware/esp32/` | Real ESP32 drivers, normalization, IDs, signing, LAN client | KRISHNA PANWAR | ADITYA SILSWAL |
-| `supabase/` | Forward-only migrations, RLS, SQL tests, deterministic seed | BHUMIKA SINGH RAWAT | PARTH AJMERA |
-| `tests/` | Cross-module contracts, integration, E2E, and hardware-in-loop evidence | BHUMIKA SINGH RAWAT | Relevant module owner |
-| `.github/workflows/` | Required CI quality gates | BHUMIKA SINGH RAWAT | PARTH AJMERA |
-| `DOCUMENTAION/` | Approved product, architecture, delivery, and operations documents | PARTH AJMERA | BHUMIKA SINGH RAWAT |
-| `packages/contracts/` | Versioned OpenAPI/JSON Schema and canonical fixtures | PARTH AJMERA approves | AASHU JOSHI, ADITYA SILSWAL, and KRISHNA PANWAR review |
-| `scripts/` | Repeatable setup, demo seed, and verification commands only | BHUMIKA SINGH RAWAT | PARTH AJMERA |
-| `scripts/demo/ml/` | Optional, non-blocking manual/recorded ML presentation artifacts only | PARTH AJMERA | AASHU JOSHI and BHUMIKA SINGH RAWAT |
-| Root configuration files | Repository-wide dependency, environment, and agent controls | PARTH AJMERA approves | Affected owners review |
+| `apps/web/src/app/(citizen)/**` | citizen profile, QR, history, points, tier/badges, dispute | YASHVARDHAN DOBHAL | PARTH AJMERA |
+| `apps/web/src/app/(municipal)/**` | QR scanner, active disposal, authorized review | YASHVARDHAN DOBHAL | PARTH AJMERA |
+| `apps/web/src/app/(developer)/**` | technical health, telemetry, ML monitor, simulation UI | YASHVARDHAN DOBHAL | ADITYA SILSWAL |
+| `apps/web/src/components/**`, `styles/**` | accessible shared UI | YASHVARDHAN DOBHAL | PARTH AJMERA |
+| `apps/web/src/fixtures/tier2-preview/**` | permanently labelled static previews only | YASHVARDHAN DOBHAL | PARTH AJMERA |
+| `apps/web/src/lib/api-client/**` | typed browser client for approved API | YASHVARDHAN DOBHAL | AASHU JOSHI |
+| `apps/web/src/app/api/v1/**` | cloud HTTP boundaries and orchestration | AASHU JOSHI | PARTH AJMERA |
+| `apps/web/src/lib/auth/**`, `validation/**` | server sessions, roles, boundary schemas | AASHU JOSHI | BHUMIKA SINGH RAWAT |
+| `apps/web/src/lib/domain/**` | cloud use cases, transactions, review/ledger flow | AASHU JOSHI | PARTH AJMERA |
+| `apps/web/src/lib/supabase/**` | scoped data adapters | AASHU JOSHI | BHUMIKA SINGH RAWAT |
+| `packages/rules-engine/**` | pure deterministic `rules-2.0.0` | AASHU JOSHI | PARTH AJMERA |
+| `services/edge-gateway/**` | LAN API, SQLite, event coordinator, capture/inference, sync, health | ADITYA SILSWAL | PARTH AJMERA |
+| `firmware/esp32/**` | hardware drivers, calibration, debounce, heartbeat, signed client | KRISHNA PANWAR | ADITYA SILSWAL |
+| `supabase/**` | lean Tier 1 schema, constraints, RLS, seed | BHUMIKA SINGH RAWAT | PARTH AJMERA |
+| `tests/**` | cross-module contracts, HIL, integration, E2E evidence | BHUMIKA SINGH RAWAT | affected module owner |
+| `.github/workflows/**` | CI gates | BHUMIKA SINGH RAWAT | PARTH AJMERA |
+| `scripts/demo/ml/**` | model/class manifest and reproducible setup evidence | ADITYA SILSWAL | BHUMIKA SINGH RAWAT, PARTH AJMERA |
+| `scripts/demo/fixtures/**` | guarded simulation fixtures | BHUMIKA SINGH RAWAT | AASHU JOSHI |
+| `scripts/demo/reset/**`, `seed/**` | deterministic reset/seed procedures | BHUMIKA SINGH RAWAT | PARTH AJMERA |
+| `DOCUMENTATION/**` | approved plans/contracts/reference | PARTH AJMERA | BHUMIKA SINGH RAWAT |
+| `packages/contracts/**` | shared public/device contract authority | PARTH AJMERA approves | AASHU JOSHI, ADITYA SILSWAL, KRISHNA PANWAR review |
+| root governance/config | repo-wide scripts, env shape, agent rules | PARTH AJMERA approves | affected owners |
 
-Ownership means final responsibility for the path. It does not allow an owner to change a frozen contract, architecture decision, or another module's assumptions.
+Ownership permits implementation inside the path; it does not permit changing the plan, contract, tier, or another module's assumptions.
 
 ## 4. Member edit boundaries
 
-### PARTH AJMERA — product, governance, integration
+### PARTH AJMERA — governance, contracts, integration, release
 
-Normal edit paths:
+Normal paths:
 
-- `DOCUMENTAION/**`
-- `README.md`
-- `AGENTS.md`
-- `.github/CODEOWNERS`
-- `.github/PULL_REQUEST_TEMPLATE.md`
-- approved root configuration changes
-- approved changes in `packages/contracts/**`
-- optional gated demo artifacts under `scripts/demo/ml/**`
+- `DOCUMENTATION/**`
+- root `README.md`, `AGENTS.md`
+- `.github/CODEOWNERS`, PR/issue templates
+- approved root configuration
+- approved `packages/contracts/**` changes
 
-PARTH AJMERA does not implement feature code on `integration` or `main`. Any optional glue code must be assigned as a task on `team/parth-ajmera-governance` with explicit allowed paths.
+Parth reviews cross-boundary contracts and merges. Feature code requires an explicitly assigned issue and allowed paths.
 
-### YASHVARDHAN DOBHAL — web user experience
+### YASHVARDHAN DOBHAL — all web role experiences
 
-Normal edit paths:
+Normal paths:
 
+- `apps/web/src/app/(auth)/**`
 - `apps/web/src/app/(citizen)/**`
-- `apps/web/src/app/(operator)/**`
-- `apps/web/src/app/(admin)/**`
+- `apps/web/src/app/(municipal)/**`
+- `apps/web/src/app/(developer)/**`
 - `apps/web/src/components/**`
 - `apps/web/src/lib/api-client/**`
-- `apps/web/src/styles/**`
-- static assets under `apps/web/public/**`
+- `apps/web/src/fixtures/tier2-preview/**`
+- `apps/web/src/styles/**`, `apps/web/public/**`
 
-YASHVARDHAN DOBHAL must not create API routes, change database queries, edit migrations, or invent response shapes in UI code.
+Yashvardhan must verify Cursor is on `team/yashvardhan-dobhal-web-ui` before every prompt. UI code may not invent fields, query Supabase service operations directly, compute final points, or remove truth labels.
 
 ### AASHU JOSHI — cloud API and rules
 
-Normal edit paths:
+Normal paths:
 
 - `apps/web/src/app/api/v1/**`
 - `apps/web/src/lib/auth/**`
@@ -177,156 +202,121 @@ Normal edit paths:
 - `apps/web/src/lib/validation/**`
 - `packages/rules-engine/**`
 
-AASHU JOSHI must not change table structure directly, edit UI-owned routes/components, or change the edge/device contract without approval.
+Aashu must not edit migrations directly, create preview APIs, change device/cloud payloads without approval, or allow client-supplied point/role/ownership values.
 
-### KRISHNA PANWAR — hardware and ESP32 firmware
+### KRISHNA PANWAR — ESP32 and physical prototype
 
-Normal edit paths:
+Normal paths:
 
 - `firmware/esp32/**`
-- hardware-in-loop fixtures explicitly assigned under `tests/hardware-in-loop/**`
+- assigned HIL tests/fixtures
 
-KRISHNA PANWAR must not embed cloud credentials, citizen data, reward rules, or penalty decisions in firmware.
+Krishna must not embed cloud credentials, citizen data, ML/business rules, or point logic. He coordinates event timing and payloads with Aditya but changes shared contracts only through Parth.
 
-### ADITYA SILSWAL — local edge gateway
+### ADITYA SILSWAL — edge gateway and local ML
 
-Normal edit paths:
+Normal paths:
 
 - `services/edge-gateway/**`
-- gateway fixtures explicitly assigned under `tests/fixtures/**`
+- `scripts/demo/ml/**`
+- assigned edge/model fixtures
 
-ADITYA SILSWAL must not connect the gateway directly to Supabase, decide rewards/penalties, or change firmware/cloud payloads independently.
+Aditya must not connect directly to Supabase, silently download/change models, invent unsupported labels, or own final point/review decisions.
 
-### BHUMIKA SINGH RAWAT — data, quality, and release
+### BHUMIKA SINGH RAWAT — data, QA, seed, CI
 
-Normal edit paths:
+Normal paths:
 
 - `supabase/**`
 - `tests/**`
 - `.github/workflows/**`
-- QA and release evidence assigned under `scripts/verification/**`
+- `scripts/demo/fixtures/**`, `seed/**`, `reset/**`
+- `scripts/verification/**`
 
-BHUMIKA SINGH RAWAT must not rewrite already-applied migrations, weaken RLS, disable checks, or fix failing product code outside an explicitly reassigned task.
+Bhumika must not rewrite applied migrations, bypass RLS, weaken checks, or edit product code without reassignment.
 
 ## 5. Dependency rules
 
-Allowed dependency direction:
+Mandatory rules:
 
-~~~text
-UI, HTTP routes, firmware drivers
-        ↓
-application use cases
-        ↓
-domain rules and versioned contract types
-        ↓
-database, network, hardware, and framework adapters
-~~~
-
-Mandatory boundaries:
-
-1. `packages/rules-engine` is pure. It imports no React, Next.js, Supabase, FastAPI, SQLite, or hardware code.
-2. UI components call the typed API client, never Supabase service-role operations.
-3. API routes validate input before calling domain use cases.
-4. Cloud use cases access Postgres only through `apps/web/src/lib/supabase`.
-5. The edge gateway accesses its own SQLite database and approved cloud APIs only. It never accesses Supabase directly.
-6. Firmware talks only to the local edge contract. It never calls Vercel or Supabase.
-7. Shared payloads and fixtures originate in `packages/contracts`. Local copies must be generated or verified against them.
-8. Cross-module tests live in root `tests`; module unit tests stay with the module.
+1. UI calls `lib/api-client`, not privileged Supabase operations.
+2. API routes validate input, authorize server-side, then call domain use cases.
+3. Domain use cases access Postgres only through `lib/supabase` adapters/RPCs.
+4. Rules engine is pure and receives normalized typed input.
+5. Firmware calls only edge `/v1`; never Vercel/Supabase.
+6. Edge accesses SQLite and approved Next.js cloud APIs; never Supabase directly.
+7. Edge ML adapters receive a locally configured capture source and pinned manifest; no request-supplied arbitrary URL/path/model.
+8. Shared external payloads originate from `packages/contracts` and golden fixtures.
+9. Tier 2 fixtures are imported only by client presentation modules; lint/tests must block imports from `api`, `domain`, `supabase`, edge, firmware, rules, or migrations.
+10. Cross-runtime tests live under root `tests`; module unit tests stay with their module.
 
 ## 6. File-placement rules
 
-| New artifact | Required location |
+| Artifact | Required location |
 |---|---|
-| Citizen page or layout | `apps/web/src/app/(citizen)/` |
-| Operator page or layout | `apps/web/src/app/(operator)/` |
-| Admin page or layout | `apps/web/src/app/(admin)/` |
+| Citizen/municipal/developer page | matching route group under `apps/web/src/app/` |
+| Tier 2 static data | `apps/web/src/fixtures/tier2-preview/` |
 | Shared visual component | `apps/web/src/components/` |
-| Browser API helper | `apps/web/src/lib/api-client/` |
 | Cloud endpoint | `apps/web/src/app/api/v1/` |
-| Cloud business use case | `apps/web/src/lib/domain/` |
-| Compliance/reward calculation | `packages/rules-engine/` |
+| Cloud use case | `apps/web/src/lib/domain/` |
+| Rules/points recommendation | `packages/rules-engine/` |
+| JSON/OpenAPI contract | `packages/contracts/` after approval |
 | FastAPI route | `services/edge-gateway/app/api/` |
-| SQLite repository/outbox | `services/edge-gateway/app/persistence/` |
-| Edge-to-cloud sync logic | `services/edge-gateway/app/services/` |
-| ESP32 sensor driver | `firmware/esp32/src/sensors/` plus header |
-| ESP32 network/signing logic | `firmware/esp32/src/network/` plus header |
-| API or IoT schema | `packages/contracts/` after approval |
-| Database change | new forward-only file in `supabase/migrations/` |
-| Seed/demo data | `supabase/seed.sql` or `scripts/demo/` |
-| Optional gated ML notebook, runner, manifest, or recorded result | `scripts/demo/ml/` |
-| Cross-service test | matching folder under `tests/` |
-| GitHub automation | `.github/workflows/` |
-| Approved project document | `DOCUMENTAION/` |
+| SQLite repository | `services/edge-gateway/app/persistence/` |
+| Camera/model adapter | `services/edge-gateway/app/ml/` |
+| Event/sync coordinator | `services/edge-gateway/app/services/` |
+| Runtime model binary | ignored `services/edge-gateway/models/` |
+| Model/class manifest | `scripts/demo/ml/` |
+| ESP32 sensor/network code | matching `firmware/esp32/src/` and `include/` path |
+| Database change | new forward-only `supabase/migrations/` file |
+| Canonical seed | `supabase/seed.sql` plus repeatable script under `scripts/demo/seed/` if needed |
+| Simulation fixture | `scripts/demo/fixtures/` |
+| Cross-service verification | appropriate root `tests/` folder |
+| Approved document | `DOCUMENTATION/` |
 
-Do not create generic dumping grounds such as `utils/`, `helpers/`, `misc/`, `common/`, `temp/`, or a second `src/` at repository root.
+Do not create `utils/`, `helpers/`, `misc/`, `temp/`, `ml/`, `esp32/`, a second `backend/`, or separate top-level citizen/municipal/developer apps.
 
-### Optional ML sidecar boundary
+## 7. Source and naming conventions
 
-`scripts/demo/ml/**` is the only approved ML tool path and is not a new product service. PARTH AJMERA may start it only after the G4 core vertical is green; AASHU JOSHI and BHUMIKA SINGH RAWAT must both review it. It may produce advisory class/category/confidence output using synthetic input, with the source persistently labeled `MANUAL_COLAB` or `RECORDED_ML`. Its only product integration is the optional observation table/API/UI frozen in `05_DATA_SCHEMA.md`, `06_API_IOT_CONTRACT.md`, and `21_ML_INTEGRATION.md`; it must not change device sync v1, deterministic rules, collection state, EcoCredits, review outcomes, or penalty behavior. A timeout, low-confidence result, licensing/privacy concern, or unavailable runtime means use the deterministic `RECORDED_ML` artifact or skip the scene; the core demo never waits.
-
-Before approval, record a compatible model/license decision and verify that no PII, credential, token, private Drive mount, or secret appears in the notebook, output, or artifact. For Ultralytics, check the official [licensing options](https://www.ultralytics.com/license); unresolved AGPL-3.0/Enterprise compatibility is `NO-GO`. Colab is optional compute with non-guaranteed availability, so follow the [Google Colab FAQ](https://research.google.com/colaboratory/faq.html) and keep the recorded fallback deterministic.
-
-## 7. Naming and source conventions
-
-- React components and exported TypeScript types: `PascalCase`.
-- TypeScript functions and variables: `camelCase`.
-- TypeScript non-component filenames: `kebab-case`.
+- React components/types: `PascalCase`; functions/variables: `camelCase`.
+- TypeScript non-component files/routes: lowercase `kebab-case`.
 - Python modules/functions: `snake_case`; classes: `PascalCase`.
 - C++ types: `PascalCase`; functions/variables: `camelCase`; constants: `UPPER_SNAKE_CASE`.
 - Database tables/columns: `snake_case`.
-- API paths: lowercase `kebab-case` only where multiple words are necessary.
+- API JSON fields/query parameters: `camelCase`; enums: `UPPER_SNAKE_CASE`.
 - Timestamps: UTC RFC 3339 at boundaries; `timestamptz` in Postgres.
-- Money: integer paise, never floating point.
-- Weight: decimal kilograms.
-- IDs: stable, globally unique, and never derived from mutable display names.
+- Points: signed integer; model score: decimal `0..1`; moisture/fill: decimal percent `0..100`.
+- IDs: globally unique, stable, and never derived from mutable display names.
+- Event source: `HARDWARE`, `RECORDED_HARDWARE`, `SIMULATED`, or `SEEDED`.
+- ML/evidence source: `LOCAL_LIVE`, `RECORDED_ML`, `SIMULATED`, or `SEEDED`.
+- UI truth badge: `REAL`, `RECORDED`, `SIMULATED`, or `PREVIEW/SEEDED`; never reuse a misleading label.
 
-## 8. Repository-wide controlled files
+## 8. Controlled files
 
-The following files have unusually high conflict or security impact and require PARTH AJMERA's approval before modification:
+Parth approval is required before modifying:
 
-- root `package.json` and `package-lock.json`;
-- `apps/web/package.json`;
-- `packages/contracts/**`;
-- `.env.example` and `.gitignore`;
-- `.github/CODEOWNERS` and required CI workflows;
-- Supabase RLS policies and destructive migrations;
-- `AGENTS.md` and the locked documents;
-- any file that changes the repository tree.
+- root/app package manifests and lockfile;
+- `packages/contracts/**` and `packages/rules-engine` public types/config;
+- `.env.example`, `.gitignore`, `.github/CODEOWNERS`;
+- RLS policies and any destructive/data-rewriting migration;
+- model/class manifest and confidence/category mapping;
+- root and documentation `AGENTS.md`;
+- any file/tree change affecting ownership or top-level layout.
 
-Dependency installation is centralized during the foundation milestone. An agent must not add a package merely to avoid implementing a small function.
+## 9. Scaffold acceptance checklist
 
-## 9. Initial scaffold acceptance checklist
-
-The repository structure is ready only when:
-
-- [ ] every top-level path in the frozen tree exists;
-- [ ] no unapproved top-level path exists;
-- [ ] root `AGENTS.md` matches the approved copy in `DOCUMENTAION/AGENTS.md`;
-- [ ] active `.gitignore` and `.env.example` exist at repository root;
-- [ ] `.github/CODEOWNERS` contains real GitHub handles;
-- [ ] root scripts provide web lint, typecheck, test, and build commands;
-- [ ] FastAPI has a passing `/healthz` test;
-- [ ] PlatformIO compiles a minimal ESP32 firmware target;
-- [ ] Supabase can reset from migrations and deterministic seed;
-- [ ] canonical v1 payload fixtures validate in firmware, edge, and cloud checks;
-- [ ] CI runs the applicable module checks on a pull request.
+- [ ] every frozen path exists and no unapproved top-level path exists;
+- [ ] root `README.md` and `AGENTS.md` are byte-identical to `DOCUMENTATION/` copies;
+- [ ] `.gitignore` excludes credentials, `.env*` secrets, SQLite runtime DB, camera artifacts, and unapproved model binaries;
+- [ ] `.env.example` contains names/placeholders only;
+- [ ] root scripts run web lint/typecheck/test/build and relevant Python/firmware/data checks;
+- [ ] FastAPI `/healthz` and a durable SQLite ingest test pass;
+- [ ] model manifest/class map parse and checksum verification has a deterministic test adapter;
+- [ ] PlatformIO compiles and golden firmware payload matches the contract;
+- [ ] Supabase resets from migrations/seed and RLS tests pass;
+- [ ] Tier 2 import-boundary test prevents server/backend use;
+- [ ] CI runs applicable checks on pull requests.
 
 ## 10. Structure change control
 
-If an assigned task genuinely cannot fit this structure, do not create an alternative path. Submit:
-
-~~~text
-CHANGE_REQUEST
-Requester:
-Task/issue:
-Blocked requirement:
-Current approved path:
-Requested structural change:
-Why the approved structure cannot satisfy it:
-Files/modules affected:
-Contract/schema/security impact:
-Alternatives considered:
-Schedule and merge-conflict impact:
-~~~
-
-Only PARTH AJMERA may approve the request. Approval is incomplete until an ADR is added, this document receives a version update, affected owners are notified, and dependent tasks are updated.
+An agent must not improvise a path. Submit a `CHANGE_REQUEST` containing the blocked requirement, current path, proposed path, alternatives, tier/contract/schema/security impact, owners, migration/test impact, and merge risk. Only PARTH AJMERA can approve; approval requires an ADR and updates to this tree, `AGENTS.md`, CODEOWNERS, issues, and dependent documents before code moves.

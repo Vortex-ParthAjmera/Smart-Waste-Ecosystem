@@ -2,11 +2,11 @@
 
 # Build Doc v4 Reconciliation and Final Scope Decision
 
-Status: approved implementation baseline v2.0  
-Approved by: PARTH AJMERA  
-Source reviewed: `Smart_Waste_Platform_Build_Doc_v4.md`  
-Source SHA-256: `fb0623e7f0f2ff3a272012781aff5abaf93ba4f614837b51e7e4a9edf385e3c3`  
-Review date: 2026-08-22  
+Status: approved implementation baseline v2.0
+Approved by: PARTH AJMERA
+Source reviewed: `Smart_Waste_Platform_Build_Doc_v4.md`
+Source SHA-256: `fb0623e7f0f2ff3a272012781aff5abaf93ba4f614837b51e7e4a9edf385e3c3`
+Review date: 2026-08-22
 Purpose: record exactly what changed, what was adapted, and what remains rejected so humans and coding agents do not combine incompatible plans.
 
 ## 1. Authority and interpretation
@@ -23,7 +23,7 @@ This document explains the delta. The updated PRD, schema, API contract, archite
 | **Tier 2 — PREVIEW** | Polished UI using declared seeded/static data | No table, endpoint, worker, or hidden backend may be created only for the preview | “This is a clearly labelled roadmap preview.” |
 | **Tier 3 — ROADMAP** | Not built for the hackathon | Documentation only; no UI pretending it exists | “This is the production roadmap.” |
 
-Tier 2 work starts only after the Tier 1 freeze gate is green. Every Tier 2 surface permanently displays `PREVIEW / SEEDED`, and every synthetic event displays `SIMULATED`.
+Tier 2 work starts only after the Tier 1 freeze gate is green. Every Tier 2 surface permanently displays `PREVIEW/SEEDED`, and every synthetic event displays `SIMULATED`.
 
 ## 3. Approved Tier 1 — real judged system
 
@@ -114,10 +114,12 @@ Decision/review state:
 
 ```text
 CAPTURED -> EVALUATING -> ACCEPTED | FLAGGED
-FLAGGED -> REVIEW_ACCEPTED | VERIFIED_VIOLATION
+FLAGGED -> REVIEW_ACCEPTED | REVIEW_NO_ACTION | VERIFIED_VIOLATION
 VERIFIED_VIOLATION -> PENALIZED
-ACCEPTED | REVIEW_ACCEPTED | PENALIZED -> CLOSED
+ACCEPTED | REVIEW_ACCEPTED | REVIEW_NO_ACTION | PENALIZED -> CLOSED
 ```
+
+`REVIEW_NO_ACTION` is the terminal zero-value outcome for insufficient evidence: it creates no point-ledger row and closes the case without implying compliance or violation.
 
 Transport state:
 
@@ -149,7 +151,7 @@ Required controls:
 - system-admin/developer role only;
 - disabled unless `DEMO_SIMULATION_ENABLED=true`;
 - fixed fictional demo citizen/device;
-- `source=SIMULATED` on every related record and UI card;
+- `eventSource=SIMULATED` and, when ML evidence exists, `evidenceSource=SIMULATED`; every related UI card shows `SIMULATED`;
 - rate limit and idempotency key;
 - deterministic fixture IDs that can be reset safely;
 - audit event for actor, request, fixture, and outcome;

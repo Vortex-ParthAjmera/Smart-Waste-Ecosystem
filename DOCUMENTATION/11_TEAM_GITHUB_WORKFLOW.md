@@ -1,483 +1,498 @@
-> **PLAN & STRUCTURE LOCK — v1.0:** This approved scope, stack, repository structure, contracts, ownership map, and delivery plan must not be changed by contributors or AI agents. Work only inside the assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR and team notification.
+> **PLAN & STRUCTURE LOCK — v2.0:** This approved scope, stack, repository structure, contracts, ownership map, truth-tier model, and delivery plan must not be changed by contributors or AI agents. Work only inside assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR, contract/document updates, and team notification.
 
 # SGV 2.0 Team and GitHub Workflow
 
-Status: Approved collaboration baseline  
-Workflow version: 1.0  
-Repository name: `sgv-2-smart-waste-ecosystem`  
-Default branch: `main`  
+Status: approved collaboration baseline v2.0
+Repository: `Vortex-ParthAjmera/Smart-Waste-Ecosystem`
+Remote: `https://github.com/Vortex-ParthAjmera/Smart-Waste-Ecosystem.git`
+Visibility: private personal-account repository during development
+Default branch: `main`
 Integration branch: `integration`
+Documentation folder: `DOCUMENTATION/`
 
 ## 1. Repository description
 
-Use this GitHub description:
+GitHub description:
 
 > ESP32-powered smart waste collection with offline edge sync, live municipal operations, and auditable citizen credits, verified penalties, and disputes.
 
-Recommended visibility is public for hackathon review if team/university rules allow it and only simulated data is used. If the repository must be private, PARTH AJMERA must confirm that the selected GitHub plan supports the required protection settings.
+The current private personal repository does **not** enforce GitHub rulesets under the account/plan shown during setup. A ruleset screen or saved configuration is not protection when GitHub says it will not be enforced. Section 4 therefore defines mandatory manual governance. If the repository becomes public or moves to an organization/plan that enforces rules, PARTH AJMERA may activate the technical controls in Section 5 after verifying them.
 
-## 2. Roles and decision rights
+## 2. Team, branches, and responsibilities
 
-| Member | GitHub-linked email | Role | Fixed branch | Final responsibility |
+| Member | GitHub-linked email | Role | Fixed branch | Primary responsibility |
 |---|---|---|---|---|
-| PARTH AJMERA | `ajmeraparth.official@gmail.com` | Product Owner, Repository Maintainer, Integration Lead | `team/parth-ajmera-governance` | scope, contracts, issue assignment, PR approval, milestone/release merges |
-| YASHVARDHAN DOBHAL | `yashvardhandobhal944@gmail.com` | Web UI Owner | `team/yashvardhan-dobhal-web-ui` | citizen/operator/admin web experience |
-| AASHU JOSHI | `aashujoshisbps@gmail.com` | Cloud API and Rules Owner | `team/aashu-joshi-cloud-api` | API, auth, use cases, compliance/reward logic |
-| KRISHNA PANWAR | `krishnapanwar464@gmail.com` | Hardware and Firmware Owner | `team/krishna-panwar-esp32` | physical prototype, calibration, ESP32 firmware |
-| ADITYA SILSWAL | `adiisilswal@gmail.com` | Edge Gateway Owner | `team/aditya-silswal-edge-gateway` | FastAPI, local durability, device auth, cloud sync |
-| BHUMIKA SINGH RAWAT | `bhumika282007@gmail.com` | Data, QA, and Release Owner | `team/bhumika-singh-rawat-data-qa` | schema/RLS, CI, tests, release verification |
+| PARTH AJMERA | `ajmeraparth.official@gmail.com` | Product Owner, Repository Maintainer, Integration Lead | `team/parth-ajmera-governance` | scope, truth tiers, contracts, issues, reviews, milestone/release merges, demo go/no-go |
+| YASHVARDHAN DOBHAL | `yashvardhandobhal944@gmail.com` | Web UI Owner | `team/yashvardhan-dobhal-web-ui` | citizen, municipal, and developer/IoT experiences inside the one Next.js app; Cursor user |
+| AASHU JOSHI | `aashujoshisbps@gmail.com` | Cloud API and Rules Owner | `team/aashu-joshi-cloud-api` | auth/RBAC, `/api/v1`, event orchestration, `rules-2.0.0`, ledger/review/simulation controls |
+| KRISHNA PANWAR | `krishnapanwar464@gmail.com` | Hardware and Firmware Owner | `team/krishna-panwar-esp32` | dual-compartment hardware, calibration, ESP32 firmware, QR/session and sensor trigger boundary |
+| ADITYA SILSWAL | `adiisilswal@gmail.com` | Edge and Local ML Owner | `team/aditya-silswal-edge-gateway` | FastAPI/SQLite edge, device auth, camera capture, local inference orchestration, cloud sync, emulator |
+| BHUMIKA SINGH RAWAT | `bhumika282007@gmail.com` | Data, QA, and Release Owner | `team/bhumika-singh-rawat-data-qa` | schema/RLS/seed, CI, security/contract/E2E evidence, release verification |
 
-PARTH AJMERA approves and merges team pull requests. BHUMIKA SINGH RAWAT reviews PARTH AJMERA's own PRs so no contributor self-approves.
+PARTH AJMERA reviews and merge-commits team PRs. BHUMIKA SINGH RAWAT provides an independent review of PARTH AJMERA-authored work. Boundary PRs also require the affected owner—for example, local ML requires ADITYA SILSWAL, AASHU JOSHI, and BHUMIKA SINGH RAWAT to verify runtime, contract/rules, and evidence respectively.
 
-The only optional ML work uses PARTH AJMERA's existing branch and `scripts/demo/ml/**`. It may begin only after G4; both AASHU JOSHI and BHUMIKA SINGH RAWAT must approve its PR. No seventh branch or ownership exception is created.
+### Temporary shared GitHub-account constraint
 
-These addresses were supplied as GitHub identities. A public repository makes committed email addresses visible, so PARTH AJMERA should confirm the team accepts that exposure or replace them with GitHub-provided no-reply commit addresses before the first public push.
+KRISHNA PANWAR and ADITYA SILSWAL currently push through ADITYA SILSWAL's GitHub account. This is a temporary operational constraint, not shared ownership of files and not proof of independent review.
 
-## 3. Branch topology
+Mandatory controls:
 
-~~~text
-main                         protected, always demo-ready
-└── integration              protected, tested team integration
+1. They use their separate fixed branches; no commit for one workstream goes to the other's branch.
+2. Each clone uses repository-local author identity with `--local`; never change the global identity to impersonate the other member.
+3. Commit authors must be the human who performed and reviewed the work; the GitHub push actor may still display as ADITYA SILSWAL's account.
+4. PARTH AJMERA reviews every PR from either branch and checks branch, allowed paths, commit author, and evidence.
+5. The shared account cannot provide an independent review between KRISHNA PANWAR and ADITYA SILSWAL. Use PARTH AJMERA plus the relevant contract/data reviewer.
+6. Never share the account password/token in Git, an issue, a PR, group chat, screenshot, serial log, or AI prompt.
+7. Separate GitHub accounts are strongly recommended as soon as practical because they improve attribution, credential safety, review independence, and recovery.
+
+Configure the two local clones exactly:
+
+```bash
+# In KRISHNA PANWAR's clone only
+git config --local user.name "KRISHNA PANWAR"
+git config --local user.email "krishnapanwar464@gmail.com"
+git switch team/krishna-panwar-esp32
+
+# In ADITYA SILSWAL's clone only
+git config --local user.name "ADITYA SILSWAL"
+git config --local user.email "adiisilswal@gmail.com"
+git switch team/aditya-silswal-edge-gateway
+```
+
+Before every commit, both run:
+
+```bash
+git branch --show-current
+git config --local --get user.name
+git config --local --get user.email
+git status --short
+```
+
+## 3. Fixed branch topology
+
+```text
+main                                      manual-policy protected; demo-ready milestones only
+└── integration                           manual-policy protected; team PR target
     ├── team/parth-ajmera-governance
     ├── team/yashvardhan-dobhal-web-ui
     ├── team/aashu-joshi-cloud-api
     ├── team/krishna-panwar-esp32
     ├── team/aditya-silswal-edge-gateway
     └── team/bhumika-singh-rawat-data-qa
-~~~
+```
+
+These eight branches already exist. Do not run `git init`, recreate them, rename them, or create replacement personal branches.
 
 Rules:
 
-1. Each person commits only to their assigned `team/*` branch.
-2. Each implementation PR targets `integration`.
-3. Only milestone/release PRs target `main`.
-4. No direct push to `integration` or `main`.
-5. The six team branches are persistent for the hackathon.
-6. Use normal merge commits into `integration` so persistent branch history remains connected.
-7. Never squash-merge a reused persistent team branch.
-8. Never rebase or force-push a shared/persistent branch.
-9. Never delete the six team branches during the event.
-10. Emergency work still uses the owning team branch and a P0 issue; it does not bypass review.
+1. Each member commits only to their fixed `team/*` branch.
+2. Every implementation/documentation PR targets `integration`.
+3. Only milestone/release PRs target `main`, always from `integration`.
+4. No direct push to `main` or `integration`, even though GitHub cannot currently enforce that rule.
+5. Do not force-push, rebase, squash-merge, or delete a persistent team branch.
+6. Use normal merge commits into `integration` and from `integration` into `main`.
+7. Emergency work still uses the owning team branch and a P0 issue.
 
-## 4. One-time repository creation
+## 4. Manual governance for the current private repository
 
-PARTH AJMERA performs this setup from the approved initial documentation/scaffold:
+Until enforceable protection is available, PARTH AJMERA applies this checklist manually:
 
-~~~bash
-git init
-git branch -M main
-git add .
-git commit -m "chore(repo): initialize SGV 2.0 monorepo"
-git remote add origin <approved-repository-url>
-git push -u origin main
+- collaborators promise not to push directly to `main` or `integration`;
+- only PARTH AJMERA performs merges into those branches;
+- every team change is visible in a PR targeting `integration`;
+- every PR states issue, truth tier, allowed paths, contract/schema/rules/model impact, tests, stored provenance fields, and UI truth badges;
+- affected checks pass locally and in GitHub Actions when workflows exist;
+- relevant owner review is recorded in the PR conversation;
+- unresolved comments, failing checks, hidden simulation, Tier 2 backend work, or out-of-scope paths block merge;
+- before merging, PARTH AJMERA verifies the base/compare branches and selects **Create a merge commit**;
+- after merging, PARTH AJMERA checks the branch log for unexpected direct commits;
+- BHUMIKA SINGH RAWAT verifies milestone readiness before `integration -> main`.
 
-git switch -c integration
-git push -u origin integration
+Technical absence of enforcement is never treated as permission to bypass the process.
 
-git switch -c team/parth-ajmera-governance integration
-git push -u origin team/parth-ajmera-governance
+## 5. Future enforceable protection
 
-git switch integration
-git switch -c team/yashvardhan-dobhal-web-ui
-git push -u origin team/yashvardhan-dobhal-web-ui
+If GitHub confirms enforcement for this repository, configure both `main` and `integration` to:
 
-git switch integration
-git switch -c team/aashu-joshi-cloud-api
-git push -u origin team/aashu-joshi-cloud-api
+- require a pull request before merging;
+- require at least one independent approval and relevant CODEOWNERS review;
+- dismiss stale approvals or require approval of the latest push;
+- require status checks and an up-to-date branch;
+- require resolved conversations;
+- block force pushes and deletion;
+- disable bypass where supported;
+- prohibit direct pushes and auto-merge during the event.
 
-git switch integration
-git switch -c team/krishna-panwar-esp32
-git push -u origin team/krishna-panwar-esp32
+Do not claim these controls are active until a deliberate prohibited test proves GitHub blocks it.
 
-git switch integration
-git switch -c team/aditya-silswal-edge-gateway
-git push -u origin team/aditya-silswal-edge-gateway
+## 6. Clone and initial checkout
 
-git switch integration
-git switch -c team/bhumika-singh-rawat-data-qa
-git push -u origin team/bhumika-singh-rawat-data-qa
-~~~
+Each member accepts the invitation, then runs from the directory where the clone should live:
 
-Before running these commands, PARTH AJMERA must confirm that no existing Git history would be overwritten and replace `<approved-repository-url>` with the actual remote.
-
-## 5. Collaborator setup
-
-Each member:
-
-1. accepts the GitHub invitation;
-2. clones the repository;
-3. fetches all remote branches;
-4. switches to the exact assigned branch;
-5. verifies the branch before every coding session;
-6. installs dependencies using the documented setup;
-7. copies `.env.example` to the approved local environment file and receives secrets through a private channel;
-8. reads root `AGENTS.md` and their issue before asking an AI agent to edit.
-
-Each member configures identity **inside this repository** (omit `--global`) using the exact name/email from the table:
-
-~~~bash
-git config user.name "FULL NAME FROM TABLE"
-git config user.email "GITHUB-LINKED EMAIL FROM TABLE"
-git config --get user.name
-git config --get user.email
-~~~
-
-Example for YASHVARDHAN DOBHAL:
-
-~~~bash
-git clone <approved-repository-url>
-cd sgv-2-smart-waste-ecosystem
+```bash
+git clone https://github.com/Vortex-ParthAjmera/Smart-Waste-Ecosystem.git
+cd Smart-Waste-Ecosystem
 git fetch origin
-git switch --track origin/team/yashvardhan-dobhal-web-ui
+git switch --track origin/team/<exact-assigned-branch>
 git branch --show-current
-~~~
+```
 
-The last command must print `team/yashvardhan-dobhal-web-ui`. The same rule applies to every member's branch.
+If the local branch already exists, use `git switch team/<exact-assigned-branch>`. Do not run `git init` inside the repository or from its parent directory.
 
-## 6. Start-of-task workflow
+### Exact setup for each existing clone
 
-Before editing:
+Run the block for the human using that laptop from inside their cloned `Smart-Waste-Ecosystem` folder. These are repository-local identities; do not add `--global`.
 
-~~~bash
+#### PARTH AJMERA
+
+```bash
+git fetch --prune origin
+git switch --track origin/team/parth-ajmera-governance
+git config --local user.name "PARTH AJMERA"
+git config --local user.email "ajmeraparth.official@gmail.com"
+git status --short --branch
+```
+
+#### YASHVARDHAN DOBHAL
+
+```bash
+git fetch --prune origin
+git switch --track origin/team/yashvardhan-dobhal-web-ui
+git config --local user.name "YASHVARDHAN DOBHAL"
+git config --local user.email "yashvardhandobhal944@gmail.com"
+git status --short --branch
+```
+
+Yashvardhan then opens this same repository folder in Cursor and confirms the lower-left branch indicator says `team/yashvardhan-dobhal-web-ui` before using Cursor or an AI agent.
+
+#### AASHU JOSHI
+
+```bash
+git fetch --prune origin
+git switch --track origin/team/aashu-joshi-cloud-api
+git config --local user.name "AASHU JOSHI"
+git config --local user.email "aashujoshisbps@gmail.com"
+git status --short --branch
+```
+
+#### KRISHNA PANWAR
+
+```bash
+git fetch --prune origin
+git switch --track origin/team/krishna-panwar-esp32
+git config --local user.name "KRISHNA PANWAR"
+git config --local user.email "krishnapanwar464@gmail.com"
+git status --short --branch
+```
+
+#### ADITYA SILSWAL
+
+```bash
+git fetch --prune origin
+git switch --track origin/team/aditya-silswal-edge-gateway
+git config --local user.name "ADITYA SILSWAL"
+git config --local user.email "adiisilswal@gmail.com"
+git status --short --branch
+```
+
+#### BHUMIKA SINGH RAWAT
+
+```bash
+git fetch --prune origin
+git switch --track origin/team/bhumika-singh-rawat-data-qa
+git config --local user.name "BHUMIKA SINGH RAWAT"
+git config --local user.email "bhumika282007@gmail.com"
+git status --short --branch
+```
+
+For PARTH AJMERA, whose local branch already exists, use `git switch team/parth-ajmera-governance` instead of the `--track` command. Apply the same replacement on any laptop that reports `fatal: a branch named ... already exists`.
+
+Every member verifies the result:
+
+```bash
+git branch --show-current
+git config --local --get user.name
+git config --local --get user.email
+git remote -v
+git status --short --branch
+```
+
+Before any coding agent is used:
+
+1. root `AGENTS.md` must be an exact copy of `DOCUMENTATION/AGENTS.md`;
+2. root `README.md` must be the approved copy of `DOCUMENTATION/README.md`;
+3. the member reads root `AGENTS.md` and one assigned issue;
+4. the branch, local identity, and clean baseline are verified;
+5. secrets are supplied only through approved local/platform configuration.
+
+## 7. Start-of-task workflow
+
+```bash
 git switch team/<assigned-branch>
-git status
+git status --short --branch
 git fetch origin
 git merge origin/integration
-git status
-~~~
+git status --short --branch
+```
 
-Then:
+Then confirm:
 
-1. read the assigned issue and root `AGENTS.md`;
-2. confirm allowed and forbidden paths;
-3. identify the authoritative contract fixture;
-4. run the current module's baseline checks;
-5. work on one issue only;
-6. open a Draft PR after the first meaningful commit.
+- one issue and its requirement IDs;
+- truth tier: `TIER_1_REAL`, `TIER_2_PREVIEW`, or `TIER_3_ROADMAP`;
+- allowed and forbidden paths;
+- input contract/fixture and expected output;
+- event sources, ML/evidence sources, and UI truth badges exercised;
+- tests and judge-visible evidence;
+- dependencies and designated reviewer.
 
-If merging `origin/integration` creates a conflict outside the member's owned paths, stop and ask PARTH AJMERA plus the affected owner. Do not guess.
+If the merge conflicts outside owned paths, stop and ask PARTH AJMERA plus the affected owner. Do not guess or accept an entire side automatically.
 
-## 7. Commits
+## 8. Issue requirements
+
+Every issue includes:
+
+- task ID and requirement IDs from `17_REQUIREMENTS_TRACEABILITY.md`;
+- single accountable owner and fixed branch;
+- truth tier;
+- exact allowed/forbidden paths;
+- dependency issues and frozen contract/model/rules versions;
+- Given/When/Then acceptance criteria;
+- test commands and evidence type;
+- event sources (`HARDWARE`, `RECORDED_HARDWARE`, `SIMULATED`, `SEEDED`);
+- ML/evidence sources (`LOCAL_LIVE`, `RECORDED_ML`, `SIMULATED`, `SEEDED`);
+- UI truth badges (`REAL`, `RECORDED`, `SIMULATED`, `PREVIEW/SEEDED`);
+- demo scene and fallback;
+- security/privacy notes.
+
+Tier rules:
+
+- Tier 1 issues require working implementation and evidence.
+- Tier 2 issues are UI-fixture-only, begin after Tier 1 freeze, and require a test showing no feature API call.
+- Tier 3 creates documentation only; no route, component, table, endpoint, worker, or dependency.
+
+## 9. Commits
 
 Use Conventional Commits:
 
-~~~text
+```text
 <type>(<scope>): <imperative summary>
-~~~
-
-Allowed types:
-
-- `feat` — new approved behavior;
-- `fix` — defect correction;
-- `test` — tests only;
-- `docs` — approved documentation;
-- `refactor` — behavior-preserving change;
-- `chore` — build/configuration maintenance.
+```
 
 Examples:
 
-~~~text
-feat(edge): persist collection messages before acknowledgement
-feat(firmware): add calibrated moisture sensor reading
-fix(credits): prevent duplicate reward for replayed event
-test(rls): isolate household collection history
-docs(plan): record approved gateway port decision
-~~~
+```text
+feat(firmware): debounce compartment IR triggers
+feat(edge): correlate local inference with disposal events
+feat(simulation): restrict injected events to demo identities
+test(tiers): prevent preview screens from calling feature APIs
+docs(governance): record private-repository manual controls
+```
+
+Allowed types: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`.
 
 Commit rules:
 
-- one coherent purpose per commit;
-- no generated build output, secrets, logs, database files, or editor settings;
-- no “final”, “changes”, “update”, or AI-generated meaningless summaries;
-- do not mix formatting across unrelated files;
-- run applicable checks before push;
-- humans review the diff before an AI-authored commit is pushed.
+- one coherent purpose;
+- no secret, PII, raw camera frame, model artifact without approval, build output, queue DB, dump, or editor state;
+- no meaningless “update/final/changes” subject;
+- no unrelated formatting or refactor;
+- run applicable checks first;
+- a human inspects the complete diff before commit and push.
 
-## 8. Pull-request size and scope
+## 10. Required pull-request body
 
-One PR implements one issue or tightly coupled task ID.
-
-Recommended limits:
-
-- fewer than 400 changed source lines, excluding generated lockfiles, migrations, and approved fixtures;
-- one owned module whenever possible;
-- no unrelated refactor;
-- no new dependency unless the issue explicitly approves it;
-- no contract/schema/structure change hidden inside a feature PR.
-
-Open a Draft PR early so integration risks are visible. Mark it ready only after local checks and self-review.
-
-## 9. Required PR body
-
-~~~markdown
+```markdown
 ## Task
-Implements: <issue/task ID>
+Implements: <issue/task and requirement IDs>
 
 ## Outcome
-<What now works, in one or two sentences>
+<What now works>
+
+## Truth tier and sources
+- Tier: TIER_1_REAL | TIER_2_PREVIEW | TIER_3_ROADMAP
+- Event sources exercised: HARDWARE | RECORDED_HARDWARE | SIMULATED | SEEDED | not applicable
+- ML/evidence sources exercised: LOCAL_LIVE | RECORDED_ML | SIMULATED | SEEDED | not applicable
+- UI truth badges verified: REAL | RECORDED | SIMULATED | PREVIEW/SEEDED | not applicable
 
 ## Allowed paths
 - <paths from issue>
 
-## Contract and schema
-- Contract version: 1.0
-- Schema/migration impact: none | <approved detail>
+## Contracts and data
+- Contract/schema/rules/model versions:
+- Migration/API impact: none | <approved detail>
+- Tier 2 backend impact: none (mandatory for Tier 2)
 
 ## Verification
 - [ ] Applicable format/lint checks
 - [ ] Typecheck/compile
 - [ ] Unit tests
-- [ ] Integration/contract test where required
-- [ ] Manual acceptance scenario
+- [ ] Contract/integration/HIL/E2E tests where required
+- [ ] Manual acceptance and fallback scenario
 
 ## Evidence
-<UI screenshots, API response, test output, ESP32 serial log, or short video>
+<screenshots, network trace, API receipt, DB assertion, serial log, model manifest/hash, or video>
 
 ## Governance
-- [ ] I did not change scope, stack, folder structure, ownership, or milestones.
+- [ ] I used my fixed branch and repository-local identity.
 - [ ] I changed only assigned paths.
-- [ ] No secret, real PII, or generated artifact is committed.
-- [ ] Root AGENTS.md was followed.
+- [ ] I did not change scope, stack, structure, contracts, ownership, or tiers without approval.
+- [ ] No secret, real PII, retained raw frame, or hidden simulated/preview data is committed.
+- [ ] Root AGENTS.md was followed and the diff was reviewed by a human.
 
 ## Risks and reviewer focus
-<Anything uncertain; do not hide it>
+<uncertainty and fallback; do not hide it>
+```
 
-## Optional ML evidence (complete only when applicable)
-- Source label: MANUAL_COLAB | RECORDED_ML
-- Core G4 evidence:
-- Model/dependency license decision:
-- Synthetic-input and no-PII/secrets check:
-- Deterministic RECORDED_ML fallback:
-- Proof of no device-contract/rules/collection-state/credit/review/penalty side effect:
-~~~
+Additional local-ML evidence: model/framework/class-map versions, weights SHA-256, dataset/provenance/license decision, supported-class tests, measured capture+inference latency, frame-retention result, timeout/multiple/unknown cases, and `RECORDED_ML` fallback.
 
-## 10. Review and merge rules
+Additional simulation evidence: role/flag/rate-limit/idempotency tests, fixed fictional identities, audit row, persistent `SIMULATED` label, and exclusion from hardware proof counts.
 
-### Team branch to integration
+## 11. Review and merge
 
-1. Author syncs `origin/integration` into their team branch.
-2. Author resolves conflicts only within owned paths.
-3. Required CI checks pass.
-4. PARTH AJMERA confirms issue scope, path ownership, acceptance evidence, and contract compliance.
-5. Relevant consumer/owner reviews a boundary change.
+### Team branch to `integration`
+
+1. Author merges current `origin/integration` into the fixed team branch.
+2. Author resolves only owned-path conflicts and runs applicable checks.
+3. Author opens/updates one scoped PR with the required body and evidence.
+4. Relevant owner verifies any contract, schema, hardware, ML, security, or UI boundary.
+5. PARTH AJMERA verifies scope, tier, paths, stored provenance, rendered truth badges, acceptance, and current checks.
 6. All conversations are resolved.
 7. PARTH AJMERA selects **Create a merge commit**.
-8. Author and other members merge updated `origin/integration` back into their team branches.
+8. Members merge updated `origin/integration` back into their own branches.
 
-### Integration to main
+### `integration` to `main`
 
-1. BHUMIKA SINGH RAWAT completes the release checklist.
-2. No P0 issue is open.
-3. Required checks pass against the current `main`.
-4. PARTH AJMERA performs the demo smoke test.
-5. PARTH AJMERA merges with a normal merge commit and creates the approved release tag.
+1. BHUMIKA SINGH RAWAT completes the release/evidence checklist.
+2. No P0 issue is open; every Tier 1 release row has proof.
+3. Preview surfaces have labels and no forbidden backend.
+4. PARTH AJMERA runs the frozen demo smoke/fallback test.
+5. PARTH AJMERA opens and merge-commits the milestone PR.
+6. Release record states any live, recorded, simulated, or previewed element used.
 
-Never use **Squash and merge** or **Rebase and merge** with the persistent team branches.
+Never squash-merge or rebase a reused persistent branch.
 
-## 11. Required branch protection
+## 12. Required checks
 
-Apply protection to both `main` and `integration`:
+Use stable workflow/check names once implemented:
 
-- require a pull request before merging;
-- require at least one approval;
-- require review from CODEOWNERS;
-- dismiss stale approvals after code changes, or require approval of the latest reviewable push;
-- require status checks to pass;
-- require the branch to be up to date;
-- require all conversations to be resolved;
-- block force pushes;
-- block branch deletion;
-- disable bypass where the repository plan permits;
-- do not allow direct pushes;
-- do not enable auto-merge during the event.
+- `web-quality` — format, lint, strict typecheck, unit test, production build;
+- `edge-quality` — Ruff/format, Pytest, SQLite durability/retry, camera/local-ML integration;
+- `firmware-build` — PlatformIO clean compile and contract/HIL fixture compatibility;
+- `database-quality` — migrations, RLS, seed/ledger/badge reconciliation;
+- `contract-quality` — schema/OpenAPI and cross-runtime fixtures;
+- `integration-smoke` — QR → hardware → edge/ML → decision → ledger → UI;
+- `truth-tier-quality` — provenance-to-truth-badge mapping and Tier 2 no-backend/no-database tests;
+- `secret-scan` — credentials, PII, queue DBs, frames, and unsafe artifacts.
 
-Required checks should be stable names:
+No one disables, renames, or converts a failing required check into a warning to merge.
 
-- `web-quality` — format, lint, typecheck, unit test, build;
-- `edge-quality` — Ruff/format, Pytest, contract/outbox tests;
-- `firmware-build` — PlatformIO clean compile and fixture compatibility;
-- `database-quality` — migration reset, SQL/RLS tests, seed validation;
-- `contract-quality` — schema/OpenAPI and cross-language fixtures;
-- `integration-smoke` — golden critical-path smoke test when affected;
-- `secret-scan` — committed credential detection.
+## 13. CODEOWNERS policy
 
-Do not make a failing check optional and do not rename a required check merely to merge.
+Use only verified GitHub usernames; never guess a handle from a display name or email. `@Vortex-ParthAjmera` is the repository owner. Until each invitation is accepted and the exact account is verified, PARTH AJMERA remains a CODEOWNER fallback for the affected path.
 
-## 12. CODEOWNERS baseline
+The committed CODEOWNERS file must cover at least:
 
-Replace placeholders with exact GitHub usernames before committing:
+```text
+/.github/                  repository owner + BHUMIKA SINGH RAWAT account
+/DOCUMENTATION/            repository owner + BHUMIKA SINGH RAWAT account
+/AGENTS.md                 repository owner + BHUMIKA SINGH RAWAT account
+/README.md                 repository owner + BHUMIKA SINGH RAWAT account
+/apps/web/                 YASHVARDHAN DOBHAL + relevant API/data owners
+/packages/contracts/       repository owner + all boundary consumers
+/packages/rules-engine/    AASHU JOSHI + repository owner
+/firmware/esp32/           current ADITYA GitHub account + repository owner
+/services/edge-gateway/    current ADITYA GitHub account + AASHU JOSHI + repository owner
+/supabase/                 BHUMIKA SINGH RAWAT + AASHU JOSHI + repository owner
+/tests/                    BHUMIKA SINGH RAWAT + repository owner
+/scripts/demo/ml/          repository owner + ADITYA SILSWAL + AASHU JOSHI + BHUMIKA SINGH RAWAT accounts
+```
 
-~~~text
-# Protect repository governance
-/.github/CODEOWNERS                         @parth-ajmera-handle
-/.github/                                  @parth-ajmera-handle @bhumika-singh-rawat-handle
-/DOCUMENTAION/                             @parth-ajmera-handle @bhumika-singh-rawat-handle
-/AGENTS.md                                 @parth-ajmera-handle @bhumika-singh-rawat-handle
-/README.md                                 @parth-ajmera-handle @bhumika-singh-rawat-handle
-/package.json                              @parth-ajmera-handle
-/package-lock.json                         @parth-ajmera-handle
-/.env.example                              @parth-ajmera-handle @bhumika-singh-rawat-handle
+Because KRISHNA PANWAR and ADITYA SILSWAL currently share one GitHub identity, CODEOWNERS cannot prove two-person review between them. Manual policy still requires the human owner name, local commit identity, evidence, and PARTH AJMERA's review.
 
-# Web UI
-/apps/web/src/app/(citizen)/               @yashvardhan-dobhal-handle @parth-ajmera-handle
-/apps/web/src/app/(operator)/              @yashvardhan-dobhal-handle @parth-ajmera-handle
-/apps/web/src/app/(admin)/                 @yashvardhan-dobhal-handle @parth-ajmera-handle
-/apps/web/src/components/                  @yashvardhan-dobhal-handle @parth-ajmera-handle
-/apps/web/src/lib/api-client/              @yashvardhan-dobhal-handle @aashu-joshi-handle @parth-ajmera-handle
+## 14. Project board and labels
 
-# Cloud API and rules
-/apps/web/src/app/api/v1/                  @aashu-joshi-handle @parth-ajmera-handle
-/apps/web/src/lib/auth/                    @aashu-joshi-handle @bhumika-singh-rawat-handle @parth-ajmera-handle
-/apps/web/src/lib/domain/                  @aashu-joshi-handle @parth-ajmera-handle
-/apps/web/src/lib/supabase/                @aashu-joshi-handle @bhumika-singh-rawat-handle @parth-ajmera-handle
-/packages/rules-engine/                    @aashu-joshi-handle @parth-ajmera-handle
+Columns:
 
-# Device and edge
-/firmware/esp32/                           @krishna-panwar-handle @aditya-silswal-handle @parth-ajmera-handle
-/services/edge-gateway/                    @aditya-silswal-handle @aashu-joshi-handle @parth-ajmera-handle
-/packages/contracts/                       @parth-ajmera-handle
-
-# Data and QA
-/supabase/                                 @bhumika-singh-rawat-handle @aashu-joshi-handle @parth-ajmera-handle
-/tests/                                    @bhumika-singh-rawat-handle @parth-ajmera-handle
-/.github/workflows/                        @bhumika-singh-rawat-handle @parth-ajmera-handle
-/scripts/demo/ml/                          @parth-ajmera-handle @aashu-joshi-handle @bhumika-singh-rawat-handle
-~~~
-
-Because any listed code owner may satisfy a code-owner requirement, team policy still requires PARTH AJMERA's approval. For PARTH AJMERA-authored changes, BHUMIKA SINGH RAWAT provides the independent approval.
-
-For `scripts/demo/ml/**`, CODEOWNERS alone is insufficient: the PR requires separate approvals from both AASHU JOSHI and BHUMIKA SINGH RAWAT.
-
-## 13. GitHub Project board
-
-Use these columns:
-
-~~~text
-Backlog → Ready → In Progress → In Review → Blocked → Done
-~~~
-
-Every issue must include:
-
-- task ID and milestone;
-- single owner;
-- fixed branch;
-- allowed paths;
-- forbidden paths;
-- dependency issues;
-- input contract/fixture;
-- Given/When/Then acceptance criteria;
-- required tests/evidence;
-- demo step;
-- priority `P0` through `P3`.
+```text
+Backlog -> Ready -> In Progress -> In Review -> Blocked -> Done
+```
 
 Recommended labels:
 
-- area: `web`, `api`, `edge`, `firmware`, `database`, `qa`, `docs`;
+- area: `web`, `api`, `edge`, `firmware`, `ml`, `database`, `qa`, `docs`;
+- tier: `tier-1-real`, `tier-2-preview`, `tier-3-roadmap`;
+- event-source: `hardware`, `recorded-hardware`, `simulated`, `seeded`;
+- ml-source: `local-live`, `recorded-ml`, `simulated`, `seeded`;
+- truth: `real`, `recorded`, `simulated`, `preview-seeded`;
 - priority: `P0`, `P1`, `P2`, `P3`;
 - state: `blocked`, `needs-decision`, `contract-change`, `demo-critical`;
 - type: `feature`, `bug`, `test`, `chore`.
-- optional demonstration source: exact labels `MANUAL_COLAB` and `RECORDED_ML`, plus `optional-ml`.
 
-Only PARTH AJMERA changes scope or moves a task out of the frozen MVP.
+Only PARTH AJMERA changes scope/tier or moves a task out of the locked release.
 
-### Optional ML PR gate
+## 15. Cursor, Freebuff, and coding-agent workflow
 
-An `optional-ml` tool PR is accepted only after the G4 core issue and required CI are green. It touches `scripts/demo/ml/**`; separately scoped owner PRs may add only the observation API/table/UI frozen in documents 05, 06, 20, and 21. Use synthetic input, expose no PII/secrets/tokens, and preserve one-message device sync v1 plus all rules/collection-state/credit/review/penalty behavior. Record the model, weights/data provenance, and license decision; if Ultralytics is used, resolve its default AGPL-3.0 versus Enterprise terms using the official [license page](https://www.ultralytics.com/license). Treat uncertainty as `NO-GO`. Because Colab resources are not guaranteed and shared notebooks expose their contents, follow the [Google Colab FAQ](https://research.google.com/colaboratory/faq.html), sanitize outputs, and attach a deterministic fallback. The visible source must remain `MANUAL_COLAB` or `RECORDED_ML`. If late or failing, close/defer the PR; the core demo never waits.
+YASHVARDHAN DOBHAL has GitHub connected to Cursor. That connection does not choose a branch, authorize scope, or merge code.
 
-## 14. Conflict handling
+Before every agent task:
 
-1. Never resolve a conflict by accepting all of one side.
-2. The owner of each affected path explains the intended behavior.
-3. Contract conflicts require PARTH AJMERA plus KRISHNA PANWAR, ADITYA SILSWAL, and AASHU JOSHI as applicable.
-4. Migration conflicts require BHUMIKA SINGH RAWAT; already-applied migration files are never rewritten.
-5. Shared root/lockfile conflicts require PARTH AJMERA.
-6. If a PR touches another owner's path accidentally, remove that part or split/reassign the work.
-7. Record an ADR only for a genuinely approved architectural decision, not for ordinary merge resolution.
-
-Prohibited conflict “solutions” include deleting another member's code, regenerating the entire scaffold, moving folders, replacing dependencies, or asking an AI to choose a side without owner input.
-
-## 15. YASHVARDHAN DOBHAL's Cursor workflow
-
-YASHVARDHAN DOBHAL has GitHub connected to Cursor. That does not authorize Cursor to select scope or merge code.
-
-Before each Cursor task:
-
-1. verify the checked-out branch is `team/yashvardhan-dobhal-web-ui`;
-2. ensure root `AGENTS.md` is present and active;
-3. give Cursor exactly one GitHub issue using the task prompt in `AGENTS.md`;
-4. state allowed/forbidden paths explicitly;
-5. require Cursor to stop with `CHANGE_REQUEST` if the frozen plan is insufficient;
-6. inspect every changed file in the diff;
+1. verify the fixed branch and local identity;
+2. confirm root `AGENTS.md` matches `DOCUMENTATION/AGENTS.md`;
+3. provide exactly one issue/task using the root prompt template;
+4. state requirement IDs, truth tier, allowed/forbidden paths, input fixture, and required proof;
+5. instruct the agent to stop with `CHANGE_REQUEST` if the plan is insufficient;
+6. inspect every changed file, stored provenance field, and UI truth badge;
 7. run checks manually;
-8. let a human commit/push and open the PR.
+8. let a human commit, push, open the PR, and respond to review.
 
-Cursor must not receive real `.env` values, Supabase service keys, gateway secrets, citizen data, or permission to work on `integration`/`main`.
+Never give an agent real `.env` values, service-role keys, gateway/device secrets, GitHub credentials, citizen PII, raw private camera frames, or permission to work directly on `integration`/`main`.
 
-The same process applies to Freebuff and every other coding agent used by the team.
+## 16. Secrets and identity safety
 
-## 16. Secrets and environment handling
+- Commit `.env.example` with safe placeholders only.
+- Store hosted secrets in Vercel/Supabase/GitHub secret stores and local secrets in ignored files.
+- Use different ESP32, edge, camera, cloud, and user credentials.
+- Phone OTP and Google OAuth use only approved fictional demo identities; pre-created role accounts are the mandatory fallback.
+- Never paste a token/password/cookie/camera URL with credentials into issues, PRs, screenshots, logs, serial output, or AI chats.
+- If exposed: stop, revoke/rotate, preserve minimal private incident evidence, scan history/artifacts, and resume only after verification.
+- A later deletion does not make a leaked secret safe.
 
-- Commit `.env.example` with names and safe placeholders only.
-- Keep local secrets in ignored environment files.
-- Store hosted secrets in Vercel/Supabase/GitHub secret stores.
-- Use separate ESP32, edge gateway, cloud, and user credentials.
-- Never paste secrets into issues, PRs, screenshots, logs, AI chats, or serial output.
-- If a key is exposed, stop, rotate/revoke it, document the incident privately, and scan history. Deleting it in a later commit is insufficient.
-- Never use real citizen PII in the prototype.
+## 17. End-of-task synchronization
 
-## 17. End-of-task sync
+After a PR is merged:
 
-After PARTH AJMERA merges a team PR:
-
-~~~bash
+```bash
 git switch team/<assigned-branch>
 git fetch origin
 git merge origin/integration
 git push origin team/<assigned-branch>
-~~~
+```
 
-Then close/advance the issue only after the merged result is visible and CI on `integration` remains green.
-
-Do not use:
-
-~~~bash
-git rebase
-git push --force
-git push --force-with-lease
-git reset --hard
-git checkout -- <shared-file>
-~~~
-
-If local history is confusing, stop and ask PARTH AJMERA. Do not “clean it up” destructively.
+Do not use `git rebase`, force push, destructive reset, or branch deletion. If history is confusing, stop and ask PARTH AJMERA.
 
 ## 18. Emergency procedure
 
 A P0 does not remove governance:
 
-1. open a P0 issue with reproduction and owner;
-2. protect the last known-good tag/deployment;
-3. owner fixes the smallest possible change on their persistent branch;
-4. add a regression test or concrete hardware reproduction;
-5. run required checks;
-6. PARTH AJMERA reviews and merge-commits to `integration`;
-7. BHUMIKA SINGH RAWAT verifies;
-8. PARTH AJMERA merges `integration` to `main` and tags the hotfix;
-9. all team branches sync `integration`.
-
-If the safe fix cannot be completed, use the documented demo fallback instead of bypassing checks.
+1. open a P0 issue with reproduction, `eventId`, event source, ML/evidence source, UI truth badge, and owner;
+2. preserve last known-good tag/deployment and evidence;
+3. owning branch makes the smallest fix plus regression proof;
+4. relevant owner and BHUMIKA SINGH RAWAT verify integrity/security effects;
+5. PARTH AJMERA reviews and merge-commits to `integration`;
+6. run the demo fallback if the safe fix cannot finish;
+7. merge `integration -> main` only after the release gate;
+8. all fixed branches sync `integration`.
 
 ## 19. Release records
 
-At minimum create:
+Use `v0.1.0-rc1` for the QA-approved candidate and `v1.0.0-hackathon-demo` for the demonstrated/submitted build unless an approved release ADR changes them.
 
-- `v0.1.0-rc1` at the QA-approved release candidate;
-- `v1.0.0-hackathon-demo` for the submitted/demoed build.
+Each release records:
 
-Each release notes:
-
-- completed user journeys;
-- hardware actually demonstrated;
-- tests and failure scenarios passed;
-- known limitations;
-- exact setup/demo procedure;
-- whether any approved fallback was used.
+- completed Tier 1 journeys and requirement IDs;
+- hardware and `LOCAL_LIVE` model actually demonstrated;
+- automated/HIL/security/failure tests passed;
+- Tier 2 previews included as frontend-only fixtures with no database row or feature API;
+- fallbacks used (`RECORDED_HARDWARE`, `RECORDED_ML`, `SIMULATED`);
+- known limitations and Tier 3 roadmap;
+- commit SHA, contract/schema/rules/model/firmware/edge versions, deployment URL, and exact startup/reset procedure.

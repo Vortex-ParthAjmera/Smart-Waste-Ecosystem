@@ -1,259 +1,288 @@
-> **PLAN & STRUCTURE LOCK — v1.0:** This approved scope, stack, repository structure, contracts, ownership map, and delivery plan must not be changed by contributors or AI agents. Work only inside the assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR and team notification.
+> **PLAN & STRUCTURE LOCK — v2.0:** This approved scope, stack, repository structure, contracts, ownership map, truth-tier model, and delivery plan must not be changed by contributors or AI agents. Work only inside assigned paths. If a change is necessary, stop and submit a `CHANGE_REQUEST`; only PARTH AJMERA may approve it, followed by an ADR, contract/document updates, and team notification.
 
 # SGV 2.0 Demo and Judging Plan
 
 | Field | Value |
 |---|---|
 | Demo owner and final go/no-go | PARTH AJMERA |
-| Hardware leads | KRISHNA PANWAR and ADITYA SILSWAL |
-| Web/UI lead | YASHVARDHAN DOBHAL |
-| Cloud/API/data lead | AASHU JOSHI |
-| QA, evidence, and fallback lead | BHUMIKA SINGH RAWAT |
-| Core story length | 7 minutes |
-| Safe setup/reset window | 10 minutes before judging |
-| Demo identities | Household `HH-10452`, Vehicle `SGV-002`, provisioned demo device |
-| Product claim | Real ESP32 collection evidence, resilient local edge, auditable EcoCredits, human-reviewed penalties, live municipal visibility |
+| Web/presentation operator | YASHVARDHAN DOBHAL |
+| Cloud API/rules explainer | AASHU JOSHI |
+| Physical hardware/firmware lead | KRISHNA PANWAR |
+| Edge, camera, and local-ML lead | ADITYA SILSWAL |
+| Seed, QA, evidence, and fallback lead | BHUMIKA SINGH RAWAT |
+| Full core story | 7 minutes 30 seconds; rehearse to <= 7:10 |
+| Compact core story | 5 minutes; keep physical, ML, exact-once, fairness, and offline proof |
+| Demo identities | fictional main citizen from seed manifest, `SGV-002`, provisioned device/gateway, fixed simulation identity |
+| Product claim | Real ESP32 and local ML, offline-safe edge custody, exactly-once points, human review before negative points, and truthful municipal visibility |
 
 ## 1. What judges must remember
 
-At the end, a judge should be able to repeat three ideas:
+At the end, a judge should be able to repeat four ideas:
 
-1. **One accountable hand-off:** SGV 2.0 links a household, vehicle, operator, waste category, sensor evidence, GPS, and outcome in one event.
-2. **Behavior change with fairness:** correct segregation earns auditable EcoCredits; uncertain evidence pauses for a human, so a noisy sensor never becomes an automatic fine.
-3. **Built for field reality:** the ESP32 can keep collecting through a local FastAPI/SQLite gateway when the internet fails and reconcile exactly once after reconnecting.
+1. **One accountable disposal:** an opaque citizen QR, compartment, sensor/camera evidence, location/time, model provenance, decision, and ledger result share one traceable event.
+2. **AI with boundaries:** the pinned local model recognizes only an explicit supported-class allowlist. Low/unknown/conflicting evidence is reviewed; the model cannot deduct points.
+3. **Fair incentives:** a valid match earns exactly `+10`; any adverse automated result is `FLAGGED 0`; only an authorized human may append reviewed `-10/-20`, with dispute and audit.
+4. **Built for field reality:** sensing, inference, FastAPI validation, and SQLite custody continue without WAN, then synchronize exactly once when connectivity returns.
 
-Do not lead with frameworks. Lead with the broken accountability loop, then reveal the architecture only as proof that the solution is feasible.
+Lead with the accountability problem and the physical event. Framework names are supporting proof, not the opening pitch.
 
 ## 2. Judging thesis
 
-| Likely criterion | SGV 2.0 proof | Concrete artifact |
+| Likely criterion | SGV 2.0 proof | Artifact to show |
 |---|---|---|
-| Problem relevance | Anonymous, mixed, untraceable collection becomes a household-linked event | Before/after opening visual and event provenance screen |
-| Innovation | A vehicle-side IoT hand-off combines edge resilience, incentives, and human-in-the-loop governance | Real ESP32 capture; edge pending queue; accepted vs flagged paths |
-| Technical depth | Versioned contracts span firmware, FastAPI/SQLite edge, Next.js, Supabase, and pure rules | Correlation trace for one event and architecture backup slide |
-| Feasibility | Uses low-cost hardware, local LAN, deterministic rules, and cloud services; no speculative AI dependency | Working hardware slice and bill of materials/stack backup |
-| Impact | Improves segregation incentives, fairness, fleet visibility, and auditable municipal operations | EcoCredit ledger, review queue, fleet map, analytics card |
-| Scalability | Device/vehicle IDs, idempotent ingestion, shared contracts, multi-ward data model | Device provisioning view and versioned event payload |
-| Sustainability | Better source segregation and fewer blind/overflow collections; claims remain prototype-oriented | Outcome/KPI card with measured demo evidence vs pilot target |
-| User experience | Citizen, operator, and admin each see only what they need | Three role views, keyboard/mobile-ready citizen screen |
-| Trust and safety | Synthetic data, RBAC/RLS, append-only audit, no auto-penalty | Review/audit evidence and negative-access test badge |
-| Completeness | Happy path, adverse path, offline recovery, tracking, and limitations are demonstrated | Demo evidence manifest and traceability coverage |
+| Problem relevance | Anonymous collection becomes a citizen-linked, compartment-specific, auditable event | event detail from opaque QR to ledger |
+| Innovation | Low-cost vehicle hardware, offline local vision, durable edge, and human-governed scoring operate as one system | physical event plus local ML and review timeline |
+| Technical depth | Versioned contracts cross ESP32, FastAPI/SQLite, local model, Next.js, and Supabase | one `eventId` correlation trace |
+| Feasibility | One laptop/phone/ESP32 stack uses pinned artifacts and disclosed fallbacks | BOM, model manifest, measured latency, health screen |
+| Reliability | WAN loss and restart do not lose or duplicate accepted events or points | live queue plus reconciliation evidence |
+| Trust/fairness | No automatic negative; review reason, actor, dispute, and append-only ledger are visible | environmental-wetting and violation review scenes |
+| Security/privacy | Opaque QR, fictional data, least-privilege roles, RLS, redacted logs, non-retained frames | negative-access test and privacy-safe camera view |
+| UX | Citizen, municipal, and developer/IoT experiences share one app but expose role-appropriate detail | three prepared browser profiles |
+| Completeness | Happy path, uncertainty, human review, offline recovery, diagnostics, and fallbacks are rehearsed | evidence manifest and run-of-show |
+| Honesty | Live, recorded, simulated, preview, and roadmap content are never visually confused | permanent source/tier badges |
 
-## 3. Demo environment and fixed dataset
+## 3. Fixed demo environment
 
 ### 3.1 Physical layout
 
-- Left: scaled SGV intake/compartment prototype with ESP32, RFID reader or QR fallback, motion/intake sensor, moisture sensor, load cell if calibrated, status LED/display, and safely secured wiring.
-- Center: edge laptop on the local LAN, with an operator portal tab and a small gateway health/queue view.
-- Right: second screen or split-screen showing citizen and admin portals.
-- Keep exposed electronics behind a clear barrier. Do not move, rewire, or power-cycle the hardware while presenting unless the fallback script explicitly calls for it.
+- **Left:** secured wet/dry prototype with one IR and ultrasonic sensor per compartment, dry-path moisture sensor, ESP32, GPS/no-fix indicator, QR stand, stable supply, and prepared waste objects.
+- **Center:** edge laptop showing compact health/queue/camera/model status. The camera view includes only the controlled disposal area.
+- **Right:** citizen, municipal, reviewer, and developer/IoT browser profiles, or a split-screen if one display is available.
+- Electronics stay behind a clear barrier. Only KRISHNA PANWAR touches wiring or power.
+- Use a rehearsed switch/fixture to demonstrate a component failure; never pull wet-area wiring unsafely on stage.
 
-### 3.2 Seed records
+### 3.2 Deterministic seed
 
-| Record | Fixed value | Purpose |
-|---|---|---|
-| Household | `HH-10452`, display name Aarav, synthetic Ward 12 profile | Memorable citizen story |
-| Identifier | Active demo RFID UID plus printed QR fallback | Continuity if reader fails |
-| Vehicle | `SGV-002` | Common ID across hardware, gateway, and portals |
-| Operator | Seeded operator account assigned to `SGV-002` | Least-privilege operator flow |
-| Admin | Seeded municipal reviewer account | Flagged-case decision |
-| Starting EcoCredits | `1,250` | Visible exact-once change to `1,300` using a 50-credit rule |
-| Accepted event | Clean state generated live | Positive reinforcement story |
-| Flagged event | Resettable seed or live mismatch | Human-review story |
-| Simulated penalty | INR 100, created only after review | Fair enforcement; explicitly not real billing |
-| GPS route | Short local route near the demo venue or clearly labeled fallback trace | Live/stale tracking proof |
+| Seed requirement | Fixed demo truth |
+|---|---|
+| Main fictional citizen | 15–25 historical events with a manifest-recorded starting balance `B` |
+| Additional citizens | four to six fictional opt-in aliases; no real names/contact data |
+| Mixed outcomes | accepted, environmental-wetting, low-confidence, pending review, reviewed `-10/-20`, dispute, degraded, offline, and simulated |
+| Ledger | every displayed balance equals the append-only sum; live accepted event changes `B` to `B + 10` once |
+| Badge/tier | at least one seeded display derived from approved seed/rule; not an editable balance |
+| Vehicle/device | `SGV-002` and one provisioned gateway/ESP32 with recorded versions |
+| Simulation identity | fixed fictional citizen/device; all downstream records say `SIMULATED` and are excluded from real metrics |
+| Tier 2 | frontend fixtures only, never stored; every surface says `PREVIEW/SEEDED` |
 
-All names, addresses, tags, and values are synthetic. The presenter must say this if asked.
+BHUMIKA SINGH RAWAT prints the exact seed counts, main starting balance, expected badge/tier, and hashes before the demo. Presenters use the manifest value rather than memorizing a stale number.
 
-### 3.3 Browser tabs, in order
+### 3.3 Prepared physical/model cases
 
-1. Opening problem/value slide or landing page.
-2. Operator `/operator` session screen.
-3. Edge health/queue view.
-4. Citizen `/citizen` dashboard for `HH-10452`.
-5. Admin `/admin` review queue.
-6. Admin fleet map/event detail/audit trace.
-7. Backup architecture, evidence, impact, and roadmap slides.
+- One supported dry item in the model allowlist with a calibrated dry-path moisture reading `<30%`.
+- One supported wet item if the allowlist/model and physical hygiene gate pass.
+- One controlled environmental-wetting case: supported dry item with moisture `>45%`.
+- One opposite-category/severe-mismatch case as a deterministic staged event or permanent `SIMULATED` fallback; never force unreliable waste/camera behavior live.
+- One unsupported item/recorded frame to show `UNKNOWN` and review behavior if time permits.
 
-Use separate browser profiles for roles. Never log out and log back in on stage.
+No presenter claims support for `plastic_wrapper`, generic `food_waste`, or any class absent from the frozen allowlist. Live physical events use `eventSource=HARDWARE`; live local inference uses evidence source `LOCAL_LIVE`; the corresponding UI badge is `REAL`. Recorded, simulated, seeded, and preview sources use only the canonical provenance and UI badges defined in `23_BUILD_DOC_V4_RECONCILIATION.md` and the contracts.
 
-## 4. Seven-minute core run-of-show
+### 3.4 Browser tabs and profiles
 
-| Time | Lead | Action and spoken point | Visible proof | Requirements proved |
-|---:|---|---|---|---|
-| 0:00-0:35 | PARTH AJMERA | State the broken loop: household segregation is invisible at hand-off, citizens lack feedback, and municipalities lack traceability. Introduce SGV 2.0 as the accountable collection point. | One-line system chain | OUT-01, OUT-02, OUT-06 |
-| 0:35-1:05 | PARTH AJMERA | Show the three actors and the vehicle-first boundary. Say explicitly: this is not a household smart bin and not an autonomous sorter. | Citizen/operator/admin overview | PRD scope boundary |
-| 1:05-2:10 | KRISHNA PANWAR + ADITYA SILSWAL | Tap Aarav's RFID (or QR fallback), choose wet waste, place the prepared demo sample, and show ESP32 intake/moisture/weight status. | Physical response plus operator session ID | FR-ID-002, FR-COL-001..006 |
-| 2:10-2:40 | ADITYA SILSWAL | Point to gateway acknowledgement and persisted event. Briefly disconnect internet after local capture to show `PENDING`; local collection remains usable. | Queue count, online/offline health | FR-EDGE-001..006, NFR-REL-002 |
-| 2:40-3:25 | AASHU JOSHI | Reconnect. Show the same event ID become `ACKED` once, then the pure rules explanation returns `ACCEPTED`. | Event trace and rule version/reason | FR-RULE-001..003, FR-AUD-002 |
-| 3:25-4:00 | YASHVARDHAN DOBHAL | Switch to Aarav: EcoCredits move from 1,250 to 1,300 exactly once and the collection appears in history. Refresh/replay without another award. | Citizen ledger/event detail | FR-ECO-001..004, FR-CIT-001 |
-| 4:00-4:55 | YASHVARDHAN DOBHAL + BHUMIKA SINGH RAWAT | Open the prepared/live mismatch. Show `FLAGGED` and zero penalty. Admin reviews evidence, records a reason, and confirms a simulated violation. | Flagged queue, decision modal, audit | FR-RULE-002, FR-REV-001..002 |
-| 4:55-5:25 | BHUMIKA SINGH RAWAT | Show the simulated penalty and citizen dispute action. Emphasize that the original record is retained and every later action is append-only. | Citizen penalty/dispute and audit trail | FR-REV-003, FR-AUD-001 |
-| 5:25-6:05 | AASHU JOSHI | Show `SGV-002` on the fleet map with last-update age and fill/device health; pause the feed or show prepared stale state. | Live-to-stale truthful state | FR-TRK-001..003, OUT-05 |
-| 6:05-6:35 | PARTH AJMERA | Summarize architecture in one sentence: ESP32 -> LAN FastAPI/SQLite edge -> authenticated cloud -> role portals. Show scale path by adding provisioned vehicles, not changing architecture. | Architecture/data-flow slide | Fixed solution baseline, NFR-MNT-001 |
-| 6:35-7:00 | PARTH AJMERA | Close with measured proof and honest limits: real prototype hardware and offline sync; simulated billing and synthetic data; production AI/route optimization are future scope. | Scorecard: events, no duplicates, evidence coverage | G4, NFR-DEM-001 |
+1. Opening value/actor screen.
+2. Citizen profile/QR/history/ledger.
+3. Municipal scan and active-disposal timeline.
+4. Developer/IoT health, edge queue, camera/model monitor.
+5. Admin/reviewer flagged queue and event evidence.
+6. Citizen dispute/history result.
+7. Architecture, test evidence, limitations, and roadmap.
+8. Optional Tier 2 preview, opened only after the scored Tier 1 story.
 
-If only five minutes are available, remove the deliberate stale-location moment and shorten the architecture/impact close; never remove the accepted, flagged/human-review, or offline proof.
+Never log out and back in on stage. Never project Supabase service dashboards, environment files, camera credentials, or secret-bearing terminals.
 
-Optional after the scored core (maximum 45 seconds): import a synthetic `MANUAL_COLAB` result, show the provenance-labelled admin evidence card, and state that it cannot change the decision or value ledger. If live inference hesitates, use `RECORDED_ML` or skip immediately.
+## 4. Seven-and-a-half-minute core run-of-show
 
-## 5. Presenter script anchors
+| Time | Lead | Scene and spoken point | Visible proof |
+|---:|---|---|---|
+| 0:00–0:35 | PARTH AJMERA | Explain the broken hand-off: segregation evidence, feedback, and accountability disappear at collection. | one-line physical-to-ledger chain |
+| 0:35–1:00 | YASHVARDHAN DOBHAL | Show the fictional citizen's reconciled history/balance and opaque QR. State that the QR contains no PII. | seed count, ledger sum, QR privacy label |
+| 1:00–2:10 | KRISHNA PANWAR | Municipal operator scans QR, selects `DRY`, and deposits the supported item. The dry IR triggers independently; real fill/moisture/GPS-or-no-fix and health appear. | physical action and live sensor evidence |
+| 2:10–2:55 | ADITYA SILSWAL | Edge commits before `202`, captures the event-correlated frame, and runs the pinned allowlisted model locally as `LOCAL_LIVE`. Briefly disable WAN after local custody to prove sensing/inference continue. | `eventId`, queue row, `REAL` badge, camera/model hash suffix, score band, WAN offline |
+| 2:55–3:40 | AASHU JOSHI | Restore WAN. The same event syncs once, rules-2.0.0 returns `ACCEPTED`, and one `+10` entry commits. Replay/refetch does not change the balance again. | transport `ACKED`, reason code, `B -> B+10`, duplicate-safe receipt |
+| 3:40–4:45 | BHUMIKA SINGH RAWAT + YASHVARDHAN DOBHAL | Open the prepared environmental-wetting event: supported dry class but moisture `>45%`. Show `FLAGGED`, `0`, then an authorized reviewer clears it and appends `+10`. | `ENVIRONMENTAL_WETTING_SUSPECTED`, evidence, actor/reason/audit |
+| 4:45–5:40 | AASHU JOSHI + BHUMIKA SINGH RAWAT | Open the staged mismatch: automation is still `FLAGGED 0`; a human verifies normal `-10` or severe wet-in-dry `-20`. Show the citizen dispute and immutable original record. | review decision, negative ledger row, dispute/audit |
+| 5:40–6:25 | ADITYA SILSWAL | Show component-level health and one rehearsed camera/sensor/model failure. Use fallback/injection only if required; show evidence source `RECORDED_ML` with badge `RECORDED`, or source/badge `SIMULATED`. | exact failed component, recovery, uncroppable source badge |
+| 6:25–6:55 | PARTH AJMERA | Summarize the trust architecture: ESP32 -> LAN FastAPI/SQLite + local ML -> authenticated cloud -> one role-separated web app. | architecture and one-event correlation trace |
+| 6:55–7:30 | PARTH AJMERA | Close with measured evidence and limits: one prototype, allowlisted classes, fictional data, reviewed point consequences, no real billing/fines, no production-scale claim. | scorecard, model/QA manifest, Tier 3 roadmap |
 
-Use these short sentences; do not memorize a long speech.
+The prepared environmental-wetting/mismatch records may come from deterministic seed or the permanently labelled demo simulation. State their source aloud. Never imply that a seeded or simulated event was the just-completed physical event.
 
-- **Opening:** "Waste may be segregated at home, but at collection the evidence and accountability disappear. SGV 2.0 makes that hand-off traceable."
-- **Hardware:** "The citizen still segregates. Our vehicle identifies the household and captures multiple supporting signals; it does not pretend one moisture reading is perfect truth."
-- **Edge:** "The truck should not stop because mobile data disappears. The local gateway acknowledges only after durable storage, then synchronizes idempotently."
-- **EcoCredits:** "This balance is not a number we edit. It is the sum of append-only ledger entries, and this event can award only once."
-- **Review:** "Notice there is still no fine. A mismatch creates a review case; only an authorized human can confirm a simulated violation."
-- **Tracking:** "A map marker is trustworthy only with freshness. When updates stop, SGV 2.0 says stale instead of pretending the vehicle is live."
-- **Close:** "We connect behavior, edge hardware, fair governance, and municipal visibility in one buildable system."
+### Compact five-minute version
 
-## 6. Acceptance evidence to capture before judging
+Keep scenes 0:00–3:40, compress environmental wetting plus one human review to 45 seconds, show the offline/health proof in 25 seconds, and close. Remove badge/leaderboard, Tier 2, extra dispute navigation, and secondary charts. Do not remove the real physical event, local ML, durable edge, exact-once `+10`, or review-before-negative explanation.
 
-Every evidence item gets a timestamp, commit SHA, test environment, owner, and pass/fail result. BHUMIKA SINGH RAWAT maintains the offline evidence folder/manifest; evidence is not invented on stage.
+## 5. System-admin simulation scene
 
-| Evidence ID | Required artifact | Pass condition | Owner |
+Use simulation only after at least one real physical-ingress event has been shown or its pre-demo evidence has been explicitly disclosed.
+
+Required visible behavior:
+
+1. system-admin authenticates;
+2. UI shows `DEMO SIMULATION` before confirmation;
+3. request uses a fixed fictional identity and idempotency key;
+4. processing joins after the physical-ingress boundary;
+5. every timeline, event, ledger, notification, log, and Realtime update shows `SIMULATED`;
+6. simulation cannot claim IR, sensor, firmware, live camera, or live model evidence;
+7. audit shows actor, fixture, request, and outcome;
+8. real-hardware proof counts and leaderboard metrics exclude it.
+
+If any label disappears or the fixed identity changes, do not use simulation on stage.
+
+## 6. Presenter script anchors
+
+- **Opening:** “Waste may be segregated at home, but at collection the evidence and accountability disappear. SGV 2.0 makes that hand-off traceable.”
+- **Hardware:** “The selected compartment triggers its own sensor path; fill is operational telemetry, and moisture is supporting evidence—not guilt.”
+- **Local ML:** “This pinned model runs on our laptop without internet and recognizes only this published allowlist. Anything else becomes unknown and goes to review.”
+- **Edge:** “The truck can keep working when mobile data disappears because FastAPI acknowledges only after SQLite has durable custody.”
+- **Points:** “This balance is the sum of immutable entries. A qualifying event earns `+10` once, even if the network retries it.”
+- **Fairness:** “The AI never subtracts points. It can only accept or flag; a named human reviewer must verify any `-10` or `-20`, and the citizen may dispute it.”
+- **Environmental wetting:** “High moisture on a dry-looking item is uncertainty, not automatic misconduct. We hold it at zero until a human checks the context.”
+- **Simulation:** “This is visibly simulated downstream recovery. It exercises the same post-ingest logic but is not hardware evidence.”
+- **Close:** “We connect physical evidence, offline intelligence, fair governance, and municipal visibility without hiding uncertainty.”
+
+## 7. Acceptance evidence before judging
+
+Every artifact includes timestamp, commit SHA, environment, versions/hashes, owner, and pass/fail. BHUMIKA SINGH RAWAT maintains an offline evidence manifest.
+
+| ID | Required artifact | Pass condition | Owner |
 |---|---|---|---|
-| DEMO-E01 | 30-60 second real hardware capture | RFID/QR, intake evidence, sensor validity, and event ID are legible | KRISHNA PANWAR |
-| DEMO-E02 | ESP32-to-edge contract log, redacted | Valid v1 payload accepted; secret absent | ADITYA SILSWAL |
-| DEMO-E03 | Edge process-kill/restart recording | Acknowledged queued event survives restart | ADITYA SILSWAL |
-| DEMO-E04 | Offline reconciliation report | >= 20 unique local events become exactly 20 cloud events with zero duplicates | AASHU JOSHI + BHUMIKA SINGH RAWAT |
-| DEMO-E05 | Rules-engine test report | All wet/dry/reject, invalid-data, and safety branches pass | AASHU JOSHI |
-| DEMO-E06 | EcoCredit concurrency/idempotency report | Duplicate delivery produces one award | AASHU JOSHI |
-| DEMO-E07 | Review/penalty database trace | Penalty cannot exist without authorized recorded review | BHUMIKA SINGH RAWAT |
-| DEMO-E08 | RLS/RBAC negative test matrix | Citizen cannot access another household; operator cannot review; anonymous is rejected | BHUMIKA SINGH RAWAT |
-| DEMO-E09 | Live/stale tracking capture | Location update age is shown and threshold changes state correctly | YASHVARDHAN DOBHAL |
-| DEMO-E10 | Accessibility smoke report | Core controls keyboard-operable; no critical automated finding | YASHVARDHAN DOBHAL + BHUMIKA SINGH RAWAT |
-| DEMO-E11 | End-to-end correlation trace | One event ID is found at firmware receipt, edge queue, cloud event, rule result, and ledger/review | PARTH AJMERA |
-| DEMO-E12 | Requirements coverage export | Every P0 requirement is `PASS` or has an approved waiver; no unowned gap | PARTH AJMERA + BHUMIKA SINGH RAWAT |
+| DEMO-E01 | physical assembly and HIL capture | QR, independent IR, fill/moisture/GPS health, stable `eventId` | KRISHNA PANWAR |
+| DEMO-E02 | signed ESP32-to-edge receipt | valid v1 message commits before `202`; secret/QR value redacted | ADITYA SILSWAL |
+| DEMO-E03 | edge kill/restart plus WAN outage | acknowledged row, camera/model result, and queue survive/recover truthfully | ADITYA SILSWAL |
+| DEMO-E04 | model manifest and offline run | correct hash/class map/license, WAN-off inference, supported/unknown tests | ADITYA SILSWAL + PARTH AJMERA |
+| DEMO-E05 | latency report | >=30 warm trials; capture+inference p95 <=2 seconds or fallback selected | ADITYA SILSWAL |
+| DEMO-E06 | rules/fairness report | accepted +10; environmental wetting `FLAGGED 0`; no automatic negative | AASHU JOSHI |
+| DEMO-E07 | idempotency/concurrency report | retry/timeout creates one event/decision/ledger effect | AASHU JOSHI + BHUMIKA SINGH RAWAT |
+| DEMO-E08 | review/dispute trace | -10/-20 impossible without authorized verified review; dispute/audit append-only | BHUMIKA SINGH RAWAT |
+| DEMO-E09 | RLS/RBAC matrix | cross-household, cross-role, Realtime, and simulation access violations denied | BHUMIKA SINGH RAWAT |
+| DEMO-E10 | seed reconciliation | 15–25 main events, 4–6 others, exact ledger sum, badges/aliases/source labels | BHUMIKA SINGH RAWAT |
+| DEMO-E11 | simulation boundary | fixed identity, system-admin, post-ingest, idempotent/audited, permanently `SIMULATED` | AASHU JOSHI + YASHVARDHAN DOBHAL |
+| DEMO-E12 | UI/accessibility/source truth | role flows work by keyboard/mobile and source/tier labels cannot be cropped | YASHVARDHAN DOBHAL |
+| DEMO-E13 | end-to-end correlation | one real `eventId` found at firmware, edge, ML, cloud, rules, ledger, and UI | PARTH AJMERA |
+| DEMO-E14 | fallback recording | timestamped same-commit F1–F4 recovery available offline | BHUMIKA SINGH RAWAT |
 
-## 7. Pre-demo checklist
+## 8. Pre-demo checklist
 
-### T-24 hours: freeze
+### T-24 hours — freeze
 
-- [ ] PARTH AJMERA declares the demo commit and prohibits unapproved dependency, schema, contract, or UI-flow changes.
-- [ ] CI, build, firmware tests, edge tests, integration tests, and critical E2E tests pass on the frozen commit.
-- [ ] Hardware is mounted, labeled, powered safely, and run for a 30-minute soak.
-- [ ] Sensor calibration values and firmware version are recorded.
-- [ ] Offline queue/restart/reconnect and duplicate replay are tested on the actual demo laptop.
-- [ ] Demo seed/reset script is tested twice from a clean state.
-- [ ] Screenshots, local video, static route trace, and evidence manifest are copied to two offline devices.
+- [ ] Tier 1 G6 is green; optional Tier 2 G7 is green or previews are removed.
+- [ ] Full CI, HIL, model/camera, offline/restart, idempotency, RLS, fairness, seed, and E2E evidence pass on the frozen commit.
+- [ ] Hardware/camera/network complete a 30-minute soak.
+- [ ] Model, class map, runtime, license decision, firmware, edge, schema, ruleset, seed, and web versions/hashes are recorded.
+- [ ] Two deterministic resets and two timed rehearsals pass.
+- [ ] Fallback video/evidence and presentation exist on two offline devices.
 
-### T-2 hours: venue rehearsal
+### T-2 hours — venue rehearsal
 
-- [ ] Confirm local hotspot/LAN works without venue internet.
-- [ ] Reserve/record edge gateway address and confirm ESP32 reconnect behavior.
-- [ ] Confirm Vercel/Supabase reachability, credentials, browser profiles, and system clock.
-- [ ] Run the seven-minute script with a stopwatch; target 6:30-6:45 to retain recovery time.
-- [ ] Reset EcoCredit starting balance, review queue, disputes, GPS route, and edge SQLite demo state using the approved reset procedure.
-- [ ] Verify RFID tag and printed QR backup; place a spare USB cable/power bank and prepared waste samples.
+- [ ] Isolated LAN works with WAN disabled and addresses remain stable.
+- [ ] Camera view contains no person/PII; model and recorded fallback work offline.
+- [ ] Vercel/Supabase, sessions, redirect providers, and fallback accounts work.
+- [ ] Prepared dry, environmental-wetting, mismatch, and unsupported objects/fixtures are ready.
+- [ ] One live script and one forced-failure script finish inside the target time.
+- [ ] No pending code, dependency, migration, model, class-map, or seed change exists.
 
-### T-10 minutes: go/no-go
+### T-10 minutes — go/no-go
 
-- [ ] Frozen commit SHA displayed in evidence manifest.
-- [ ] ESP32 heartbeat `ONLINE`; enabled sensors have known validity/calibration state.
-- [ ] Edge shows cloud reachable, `pending=0`, `dead_letter=0`, and enough disk space.
-- [ ] `HH-10452` shows exactly 1,250 EcoCredits and the prepared flagged case is in the expected state.
-- [ ] Operator, citizen, and admin browser sessions are authenticated and on their first screens.
-- [ ] Live GPS or the explicitly labeled fallback route is ready.
-- [ ] Backup video opens locally with audio muted by default.
-- [ ] PARTH AJMERA assigns the active fallback level and says "go".
+- [ ] Frozen commit/tag and evidence manifest are open.
+- [ ] Seed counts/balance match the manifest.
+- [ ] Edge queue and disk are healthy; staged queue state is documented.
+- [ ] ESP32 and enabled components are current; degraded/no-fix states are explicit.
+- [ ] Camera frame is fresh; model hash/class map match; fallback opens offline.
+- [ ] All role profiles are authenticated and on their first tab.
+- [ ] Simulation is disabled until its scene; Tier 2 labels are visible if previews remain.
+- [ ] PARTH AJMERA records the chosen fallback level and says “go.”
 
-## 8. Demo fallback ladder
+## 9. Fallback ladder and exact disclosure
 
-Fallbacks preserve honesty and the same product narrative. Never claim a recording or simulated stream is live.
-
-| Level | Trigger | Response | Exact disclosure |
+| Level | Trigger | Response | Presenter disclosure |
 |---|---|---|---|
-| F0 - Full live | Hardware, LAN, edge, and cloud healthy | Run the core script | "This is the live end-to-end prototype." |
-| F1 - Hardware live, cloud unavailable | Venue internet/cloud fails but local LAN works | Show live ESP32 -> edge, offline queue/restart; use local recording/screens for cloud outcomes | "The hardware and offline path are live; these cloud screens are a recorded run from the frozen build." |
-| F2 - Hardware input unavailable | RFID/sensor/GPS fails but gateway/web works | Use signed, pre-captured v1 fixtures through edge; show hardware diagnostic and prior HIL evidence | "The hardware fault is visible. We are replaying a captured device payload through the same validated contract." |
-| F3 - App/cloud unavailable | Web deployment or auth fails | Play the local end-to-end video and inspect offline evidence/test report | "The service is unavailable at the venue; this is a timestamped run of the same commit, followed by its evidence." |
-| F4 - Total presentation failure | Power/display/network blocks all live systems | Deliver three-minute verbal pitch with printed architecture/results and optional battery-powered hardware indication | "We cannot safely run the system here; these are the verified pre-demo results and limitations." |
+| F0 — full live | all paths healthy | run core | “This is the live end-to-end prototype.” |
+| F1 — WAN/cloud down | hardware/edge/camera/model healthy | show real local flow and queue; use recorded cloud completion | “The physical and offline local path are live; this cloud completion is recorded from the frozen build.” |
+| F2 — camera/model down | hardware/edge/cloud healthy | show health failure; use `RECORDED_ML` as `FLAGGED 0` pending review | “The sensing path is live; this model result is the disclosed recorded fallback and requires review.” |
+| F3 — hardware down | edge/cloud/UI healthy | show diagnostic; use `RECORDED_HARDWARE` fixture or `SIMULATED` downstream event | “This input is recorded/simulated and is not counted as live hardware.” |
+| F4 — app/auth down | local path healthy | show local event/inference/queue then timestamped full recording | “The hosted app is unavailable; this is verified evidence from the same release commit.” |
+| F5 — total live failure | power/display/network unsafe | stop live system; use offline recording and printed proof | “We cannot safely run it here; these are the verified pre-demo results and limitations.” |
 
-### Failure ownership during the demo
+### Failure ownership
 
-- PARTH AJMERA keeps speaking and decides whether to switch levels.
-- KRISHNA PANWAR touches physical wiring/power only.
-- ADITYA SILSWAL diagnoses firmware/edge/LAN only.
-- AASHU JOSHI diagnoses API/Supabase only.
-- YASHVARDHAN DOBHAL controls browser/UI only.
-- BHUMIKA SINGH RAWAT opens evidence/video and records the incident.
+- PARTH AJMERA keeps speaking and selects the fallback.
+- KRISHNA PANWAR alone handles hardware/power.
+- ADITYA SILSWAL handles LAN, edge, camera, and model.
+- AASHU JOSHI handles cloud API/rules.
+- YASHVARDHAN DOBHAL handles browser/UI.
+- BHUMIKA SINGH RAWAT opens evidence/fallback and records the incident.
 
-No more than 20 seconds may be spent silently debugging on stage.
+Do not debug silently for more than 20 seconds.
 
-## 9. Reset and repeatability protocol
+## 10. Reset and repeatability
 
-The approved reset operation must be scripted under `scripts/`; manual database editing immediately before judging is prohibited.
+Use only the approved reset operation. It must verify the demo project, archive prior IDs, restore the deterministic fictional seed and starting balance, reset designated disposable events/edge rows, retain source labels, and print expected counts/hashes. It must never hand-edit a ledger balance, review, audit, or source field.
 
-Reset must:
+After a live event, compare:
 
-1. Verify the environment is the demo project, not any future real environment.
-2. Archive the prior run's event IDs for evidence.
-3. Restore the synthetic household and role accounts.
-4. Restore EcoCredit ledger/balance to the documented seed state through a safe seed transaction.
-5. Restore one unresolved flagged case and remove only designated disposable demo-run records.
-6. Restore `SGV-002` status and route fixture.
-7. Clear/recreate only the designated edge demo queue with an explicit confirmation flag.
-8. Print a manifest of final counts and hashes so BHUMIKA SINGH RAWAT can compare expected state.
+- seed manifest starting balance vs ledger-derived balance;
+- one new physical event ID;
+- one accepted `+10` or one `FLAGGED 0` result;
+- no duplicate ML observation or ledger effect;
+- queue returned to its expected count;
+- simulation and preview rows remain excluded from real proof.
 
-Run the reset no more than necessary. Destructive production-wide commands and broad table truncation are forbidden.
+## 11. Judge Q&A bank
 
-## 10. Judge Q&A bank
-
-| Question | Concise answer | Proof to open if requested |
+| Question | Concise answer | Proof |
 |---|---|---|
-| "Can moisture really classify waste?" | No single sensor is treated as truth. Moisture, intake, weight validity, declared category, and data quality feed explainable rules; uncertainty is reviewed by a human. | Flagged event reason and rules tests |
-| "Why not AI?" | The core solves accountability with explainable evidence. Our optional labelled notebook demonstrates the integration shape, but an unvalidated model cannot decide guilt; production camera AI needs representative data, evaluation, monitoring, privacy, and licensing work. | Optional ML evidence card and limitations |
-| "What happens without internet?" | ESP32 uses the local LAN; FastAPI validates and SQLite persists before acknowledgement. It later retries with stable idempotency keys. | Live queue plus DEMO-E03/E04 |
-| "How do you avoid duplicate rewards?" | Event and ledger idempotency are enforced at the database boundary; retries return the existing canonical result. | Concurrency test and ledger row |
-| "Can a sensor fine someone?" | No. Automation can accept or flag only. A role-authorized human records evidence and reason before a simulated penalty can exist. | Review trace and constraint test |
-| "Are EcoCredits real money?" | In v1 they are auditable prototype points. Redemption and municipal billing are simulated; real payouts require an authorized provider and policy review. | Ledger UI and limitation statement |
-| "How is citizen privacy protected?" | Synthetic demo data, minimum operator disclosure, RLS/server role checks, precise GPS limited by role, and append-only audits. | Role comparison and negative-access matrix |
-| "How does this scale?" | Each device and vehicle is provisioned, contracts are versioned, sync is idempotent and concurrently processed, and the cloud schema is multi-vehicle/ward. Production capacity testing remains future work. | Device/event IDs and architecture slide |
-| "Why FastAPI locally and Next.js in cloud?" | They solve different constraints: FastAPI/Pydantic gives a small reliable hardware gateway with SQLite; Next.js unifies portals and cloud APIs. JSON contracts keep the boundary explicit. | Contract parity test |
-| "Why HTTP instead of MQTT?" | LAN HTTP/JSON is easier to integrate, test, and recover within the hackathon. MQTT remains a compatible stretch transport, not an MVP dependency. | Edge endpoint and scope table |
-| "Is this a smart bin?" | No. It is a smart garbage vehicle collection platform. Households segregate waste; identity and evidence are captured at the vehicle hand-off. | Product boundary slide |
-| "What would a pilot require?" | Municipal policy approval, field calibration, DPIA/privacy and retention decisions, stronger device provisioning, operational support, security testing, and authorized billing/reward integrations. | Risk register/roadmap |
+| “Can your model identify every type of waste?” | No. This build recognizes a frozen supported-class allowlist. Unsupported, conflicting, or low-score items become `UNKNOWN` and go to review. | class map/model manifest and unknown test |
+| “Is confidence an accuracy probability?” | No. It is the model's score. We show LOW/MEDIUM/HIGH bands and do not call it calibrated probability. | UI label and threshold tests |
+| “Can AI subtract points?” | No. Automation may award a valid `+10` or flag with `0`. Only an authorized verified human decision may append `-10/-20`. | rules and database constraint trace |
+| “What about a dry item that is wet from rain?” | High moisture plus a dry visual class becomes environmental-wetting review with `0`, not punishment. A reviewer may clear it and award `+10`. | environmental-wetting scene |
+| “What happens without internet?” | Sensing, camera capture, local inference, validation, and SQLite custody continue on the LAN. Cloud sync resumes with the same idempotency key. | live queue/restart evidence |
+| “How do you prevent duplicate points?” | Message and domain IDs, payload hashes, transactions, and unique ledger constraints return the stored result for an exact retry. | duplicate/concurrency report |
+| “Is Inject Test Event real hardware?” | No. It joins after physical ingest, is fixed-identity and permanently `SIMULATED`, and is excluded from hardware metrics. | simulation UI/audit |
+| “Do you store camera images?” | Frames are not retained by default. We store bounded provenance/hashes; debug retention is controlled, synthetic/consented, and expires. | config and privacy test |
+| “Are these citizens and penalties real?” | No. All citizens, points, reviews, and disputes are fictional prototype data; there is no real fine, payment, or government integration. | seed manifest and limitations |
+| “Why FastAPI locally?” | It validates and durably stores the physical event even when WAN fails, and it safely orchestrates event-correlated local inference. | SQLite/restart trace |
+| “Why HTTP rather than MQTT?” | Signed LAN HTTP/JSON is simpler to test and recover in 30 hours; MQTT is roadmap, not a hidden dependency. | frozen architecture/contract |
+| “How do previews differ from real features?” | Every preview is frontend-seeded, permanently labelled, and has no dedicated database/API. | network/schema check and label |
 
-## 11. Claims discipline
+## 12. Claims discipline
 
 ### Safe claims
 
-- "The prototype demonstrates..."
-- "Our test on the demo network measured..."
-- "The architecture is designed to..."
-- "The system records supporting evidence and routes uncertainty to a human..."
+- “The prototype demonstrates…”
+- “This prepared item is in our frozen supported-class allowlist…”
+- “On this demo laptop, our recorded p95 was…”
+- “The model produced a score; deterministic rules and human review govern the value outcome…”
+- “This event is live hardware,” “this result is recorded,” or “this card is simulated/preview,” according to the visible source.
 
-### Prohibited claims without external proof
+### Prohibited claims
 
-- "100% accurate waste detection," "eliminates mixed waste," or "guarantees compliance."
-- "DPDP compliant," "government approved," or "legally issues fines."
-- "Production-ready for every municipality" or unmeasured city-scale throughput.
-- "AI-powered" when the v1 decision is deterministic rules.
-- "Live GPS" when a prerecorded/simulated fallback is active.
-- "Real payments/billing" for the simulated EcoCredit and penalty flows.
+- “100% accurate,” “recognizes all waste,” “full confidence,” or “proves misconduct.”
+- “AI fines citizens” or any claim that a sensor/model creates a negative value without review.
+- “DPDP compliant,” “government approved,” “Aadhaar integrated,” or “legally issues fines.”
+- “Works fully without internet” without clarifying that hosted cloud/UI wait for WAN.
+- “Live GPS/model/hardware” while a recorded, no-fix, simulated, or preview source is active.
+- “Real rewards, UPI, discounts, billing, or payments.”
+- “Production ready,” “city scale,” or unsupported class/model-performance claims.
 
-## 12. Rehearsal scorecard and release decision
+## 13. Rehearsal scorecard
 
-Score each item `0 = failed`, `1 = works with fallback`, `2 = clean live`. P0 safety/truth items cannot be waived merely by a high total.
+Score `0 = failed`, `1 = disclosed fallback`, `2 = clean live`. Integrity/truth items cannot be waived by a high total.
 
 | Dimension | Max | Release threshold |
 |---|---:|---:|
 | Clear problem and vehicle-first scope | 4 | 3 |
-| Hardware capture and physical safety | 6 | 4, with no safety failure |
-| Offline durability and exact-once reconciliation | 6 | 5 |
-| Accepted/EcoCredit journey | 6 | 5 |
-| Flagged/human-review/dispute journey | 6 | 5, with zero auto-penalty |
-| Tracking freshness truthfulness | 4 | 3 |
-| Portal usability and role separation | 4 | 3 |
-| Evidence availability and claims accuracy | 6 | 5 |
-| Timing, hand-offs, and Q&A | 4 | 3 |
-| **Total** | **46** | **36** |
+| Safe physical QR/dual-compartment sensing | 6 | 5, no safety failure |
+| Durable edge and offline/restart recovery | 6 | 5 |
+| Local camera/model allowlist, correlation, latency, fallback | 6 | 5, no privacy/license failure |
+| Accepted exact-once `+10` | 6 | 5 |
+| Environmental wetting and human review before `-10/-20` | 6 | 5, zero automatic negative |
+| RLS/role separation and audit/dispute | 4 | 4 |
+| Role UX, accessibility, and source/tier labels | 4 | 3 |
+| Evidence, reset repeatability, and claims accuracy | 6 | 5 |
+| Timing, handoffs, and Q&A | 4 | 3 |
+| **Total** | **52** | **43**, with every mandatory truth/integrity condition met |
 
-PARTH AJMERA declares `GO`, `GO WITH FALLBACK F1/F2`, or `NO-GO`. A no-go means the team presents the verified fallback; it does not authorize last-minute scope or structure changes.
+PARTH AJMERA declares `GO LIVE`, `GO WITH FALLBACK`, or `NO-GO LIVE — VERIFIED RECORDING`. A fallback decision does not authorize unlabelled simulation or last-minute scope changes.
 
-## 13. Final 20-second close
+## 14. Final close
 
-"SGV 2.0 makes the moment of collection accountable. We demonstrated real edge hardware, offline-safe synchronization, exactly-once EcoCredits, human review before a simulated penalty, and truthful fleet tracking. It is a practical path from a blind garbage truck to a fair, connected municipal service - without pretending that one sensor or an unvalidated AI model can make legal decisions."
+“SGV 2.0 makes the moment of collection accountable. We demonstrated real compartment sensing, allowlisted offline vision, durable local custody, duplicate-safe `+10` rewards, human review before any negative points, and role-safe municipal visibility. It is a practical, honest path from a blind collection hand-off to a fair and auditable waste ecosystem.”
