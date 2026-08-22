@@ -1,0 +1,244 @@
+{
+  "$schema": "negative-fixtures-v1",
+  "description": "Invalid payloads that must be rejected by firmware, Pydantic, Zod, and SQL validation.",
+  "fixtures": [
+    {
+      "fixtureId": "missing-messageId",
+      "description": "Missing required messageId field",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001"
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "invalid-schema-version",
+      "description": "Wrong schema version",
+      "payload": {
+        "schemaVersion": "2.0",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001"
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "invalid-compartment",
+      "description": "Invalid compartment value (not WET or DRY)",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001",
+        "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+        "sequence": 185,
+        "occurredAt": "2026-08-22T14:28:11.123Z",
+        "timeQuality": "DEVICE_SYNCED",
+        "firmwareVersion": "smart-waste-esp32-1.0.0",
+        "payload": {
+          "eventId": "0191b9e8-ee15-76af-89f9-ce1470a08130",
+          "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+          "eventSource": "HARDWARE",
+          "selectedCompartment": "RECYCLABLE",
+          "trigger": {
+            "componentCode": "ir-dry-1",
+            "triggered": true,
+            "quality": "GOOD",
+            "capturedAt": "2026-08-22T14:28:10.900Z"
+          },
+          "measurements": [],
+          "location": { "fixQuality": "NO_FIX" }
+        },
+        "extensions": {}
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "negative-fill-percent",
+      "description": "Fill percent below 0",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001",
+        "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+        "sequence": 186,
+        "occurredAt": "2026-08-22T14:28:11.123Z",
+        "timeQuality": "DEVICE_SYNCED",
+        "firmwareVersion": "smart-waste-esp32-1.0.0",
+        "payload": {
+          "eventId": "0191b9e8-ee15-76af-89f9-ce1470a08131",
+          "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+          "eventSource": "HARDWARE",
+          "selectedCompartment": "DRY",
+          "trigger": {
+            "componentCode": "ir-dry-1",
+            "triggered": true,
+            "quality": "GOOD",
+            "capturedAt": "2026-08-22T14:28:10.900Z"
+          },
+          "measurements": [
+            {
+              "componentCode": "ultrasonic-dry-1",
+              "code": "FILL_DRY_PERCENT",
+              "value": -5.0,
+              "unit": "PERCENT",
+              "quality": "GOOD",
+              "capturedAt": "2026-08-22T14:28:11.000Z"
+            }
+          ],
+          "location": { "fixQuality": "NO_FIX" }
+        },
+        "extensions": {}
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "overflow-fill-percent",
+      "description": "Fill percent above 100",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001",
+        "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+        "sequence": 187,
+        "occurredAt": "2026-08-22T14:28:11.123Z",
+        "timeQuality": "DEVICE_SYNCED",
+        "firmwareVersion": "smart-waste-esp32-1.0.0",
+        "payload": {
+          "eventId": "0191b9e8-ee15-76af-89f9-ce1470a08132",
+          "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+          "eventSource": "HARDWARE",
+          "selectedCompartment": "DRY",
+          "trigger": {
+            "componentCode": "ir-dry-1",
+            "triggered": true,
+            "quality": "GOOD",
+            "capturedAt": "2026-08-22T14:28:10.900Z"
+          },
+          "measurements": [
+            {
+              "componentCode": "ultrasonic-dry-1",
+              "code": "FILL_DRY_PERCENT",
+              "value": 150.0,
+              "unit": "PERCENT",
+              "quality": "GOOD",
+              "capturedAt": "2026-08-22T14:28:11.000Z"
+            }
+          ],
+          "location": { "fixQuality": "NO_FIX" }
+        },
+        "extensions": {}
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "gps-zero-zero",
+      "description": "GPS coordinates 0,0 (forbidden fallback)",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001",
+        "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+        "sequence": 188,
+        "occurredAt": "2026-08-22T14:28:11.123Z",
+        "timeQuality": "DEVICE_SYNCED",
+        "firmwareVersion": "smart-waste-esp32-1.0.0",
+        "payload": {
+          "eventId": "0191b9e8-ee15-76af-89f9-ce1470a08133",
+          "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+          "eventSource": "HARDWARE",
+          "selectedCompartment": "DRY",
+          "trigger": {
+            "componentCode": "ir-dry-1",
+            "triggered": true,
+            "quality": "GOOD",
+            "capturedAt": "2026-08-22T14:28:10.900Z"
+          },
+          "measurements": [],
+          "location": {
+            "fixQuality": "GPS_2D",
+            "latitude": 0.0,
+            "longitude": 0.0
+          }
+        },
+        "extensions": {}
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "wet-event-with-dry-moisture",
+      "description": "Wet event should not have dry-path moisture measurement",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001",
+        "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+        "sequence": 189,
+        "occurredAt": "2026-08-22T14:28:11.123Z",
+        "timeQuality": "DEVICE_SYNCED",
+        "firmwareVersion": "smart-waste-esp32-1.0.0",
+        "payload": {
+          "eventId": "0191b9e8-ee15-76af-89f9-ce1470a08134",
+          "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+          "eventSource": "HARDWARE",
+          "selectedCompartment": "WET",
+          "trigger": {
+            "componentCode": "ir-wet-1",
+            "triggered": true,
+            "quality": "GOOD",
+            "capturedAt": "2026-08-22T14:28:10.900Z"
+          },
+          "measurements": [
+            {
+              "componentCode": "moisture-dry-1",
+              "code": "MOISTURE_DRY_PERCENT",
+              "value": 22.8,
+              "unit": "PERCENT",
+              "quality": "GOOD",
+              "capturedAt": "2026-08-22T14:28:11.050Z"
+            }
+          ],
+          "location": { "fixQuality": "NO_FIX" }
+        },
+        "extensions": {}
+      },
+      "expectedError": "VALIDATION_ERROR"
+    },
+    {
+      "fixtureId": "malformed-timestamp",
+      "description": "Non-RFC3339 timestamp",
+      "payload": {
+        "schemaVersion": "1.1",
+        "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+        "messageType": "DISPOSAL_EVENT_V1",
+        "deviceCode": "ESP32-001",
+        "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+        "sequence": 190,
+        "occurredAt": "2026-08-22 14:28:11",
+        "timeQuality": "DEVICE_SYNCED",
+        "firmwareVersion": "smart-waste-esp32-1.0.0",
+        "payload": {
+          "eventId": "0191b9e8-ee15-76af-89f9-ce1470a08135",
+          "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+          "eventSource": "HARDWARE",
+          "selectedCompartment": "DRY",
+          "trigger": {
+            "componentCode": "ir-dry-1",
+            "triggered": true,
+            "quality": "GOOD",
+            "capturedAt": "2026-08-22T14:28:10.900Z"
+          },
+          "measurements": [],
+          "location": { "fixQuality": "NO_FIX" }
+        },
+        "extensions": {}
+      },
+      "expectedError": "VALIDATION_ERROR"
+    }
+  ]
+}

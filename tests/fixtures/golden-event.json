@@ -1,0 +1,143 @@
+{
+  "$schema": "test-fixture-v1",
+  "description": "Golden event fixture for cross-module contract tests. Must be accepted by firmware, Pydantic, Zod, and SQL validation.",
+  "fixtureId": "golden-dry-bottle-v1",
+  "eventSource": "HARDWARE",
+  "selectedCompartment": "DRY",
+  "deviceCode": "ESP32-001",
+  "gatewayCode": "EDGE-001",
+  "citizenId": "b0000000-0000-0000-0000-000000000001",
+  "citizenCode": "CIT-0001",
+  "rulesetVersion": "rules-2.0.0",
+
+  "lanPayload": {
+    "schemaVersion": "1.1",
+    "messageId": "0191b9eb-dbf9-79ac-9e1d-13e31c8294e3",
+    "messageType": "DISPOSAL_EVENT_V1",
+    "deviceCode": "ESP32-001",
+    "bootId": "0191b9ea-6d14-7402-89a8-6ac3a4d24f8b",
+    "sequence": 184,
+    "occurredAt": "2026-08-22T14:28:11.123Z",
+    "timeQuality": "DEVICE_SYNCED",
+    "firmwareVersion": "smart-waste-esp32-1.0.0",
+    "payload": {
+      "eventId": "0191b9e8-ee15-76af-89f9-ce1470a0812f",
+      "sessionId": "0191b9e8-eef4-7e5c-b43d-9f3668c37a5d",
+      "eventSource": "HARDWARE",
+      "selectedCompartment": "DRY",
+      "trigger": {
+        "componentCode": "ir-dry-1",
+        "triggered": true,
+        "quality": "GOOD",
+        "capturedAt": "2026-08-22T14:28:10.900Z"
+      },
+      "measurements": [
+        {
+          "componentCode": "ultrasonic-dry-1",
+          "code": "FILL_DRY_PERCENT",
+          "value": 41.2,
+          "unit": "PERCENT",
+          "quality": "GOOD",
+          "capturedAt": "2026-08-22T14:28:11.000Z",
+          "calibrationVersion": "fill-dry-2026-08-a"
+        },
+        {
+          "componentCode": "moisture-dry-1",
+          "code": "MOISTURE_DRY_PERCENT",
+          "value": 22.8,
+          "unit": "PERCENT",
+          "quality": "GOOD",
+          "capturedAt": "2026-08-22T14:28:11.050Z",
+          "calibrationVersion": "moisture-2026-08-a"
+        }
+      ],
+      "location": {
+        "fixQuality": "NO_FIX"
+      }
+    },
+    "extensions": {}
+  },
+
+  "expectedOutcomes": {
+    "rulesResult": {
+      "outcome": "ACCEPTED",
+      "suggestedSeverity": "NONE",
+      "reasonCodes": ["SUPPORTED_CATEGORY_MATCH", "DRY_MOISTURE_NORMAL"],
+      "pointsDelta": 10
+    },
+    "mlDetection": {
+      "status": "DETECTED",
+      "detectedLabel": "bottle",
+      "friendlyLabel": "Plastic Bottle",
+      "predictedCategory": "DRY",
+      "score": 0.96,
+      "confidenceBand": "HIGH",
+      "evidenceSource": "LOCAL_LIVE"
+    },
+    "processingState": "COMPLETED",
+    "decisionState": "ACCEPTED"
+  },
+
+  "allScenarios": [
+    {
+      "scenarioId": "accepted-dry-bottle",
+      "description": "Correct dry disposal — high confidence, normal moisture",
+      "expectedOutcome": "ACCEPTED",
+      "expectedPoints": 10
+    },
+    {
+      "scenarioId": "accepted-wet-food",
+      "description": "Correct wet disposal — food waste in wet compartment",
+      "expectedOutcome": "ACCEPTED",
+      "expectedPoints": 10
+    },
+    {
+      "scenarioId": "flagged-low-confidence",
+      "description": "Dry disposal with low ML confidence (< 0.60)",
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0
+    },
+    {
+      "scenarioId": "flagged-environmental-wetting",
+      "description": "Dry item with moisture > 45%",
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0
+    },
+    {
+      "scenarioId": "flagged-category-mismatch",
+      "description": "Wet item placed in dry compartment",
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0
+    },
+    {
+      "scenarioId": "flagged-severe-wet-in-dry",
+      "description": "Severe wet-in-dry with high confidence and moisture > 45%",
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0
+    },
+    {
+      "scenarioId": "ml-unavailable",
+      "description": "Model unavailable — safe fallback",
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0
+    },
+    {
+      "scenarioId": "review-accepted",
+      "description": "Flagged event reviewed and accepted by officer",
+      "expectedOutcome": "REVIEW_ACCEPTED",
+      "expectedPoints": 10
+    },
+    {
+      "scenarioId": "verified-violation-normal",
+      "description": "Category mismatch confirmed — -10 points",
+      "expectedOutcome": "VERIFIED_VIOLATION",
+      "expectedPoints": -10
+    },
+    {
+      "scenarioId": "verified-violation-severe",
+      "description": "Severe wet-in-dry confirmed — -20 points",
+      "expectedOutcome": "VERIFIED_VIOLATION",
+      "expectedPoints": -20
+    }
+  ]
+}
