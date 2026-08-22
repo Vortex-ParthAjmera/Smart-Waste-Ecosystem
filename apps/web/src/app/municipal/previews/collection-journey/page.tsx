@@ -2,6 +2,7 @@
 
 import { PageHeader } from "@/components/PageHeader";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { EmptyState } from "@/components/StateViews";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,20 @@ import { cn } from "@/lib/utils";
 export default function CollectionJourneyPreviewPage() {
   const stages = apiClient.collectionStages();
   const truck = apiClient.listTrucks()[0];
+
+  if (!truck) {
+    return (
+      <div className="space-y-3">
+        <PageHeader title="Collection Journey" />
+        <PreviewBanner />
+        <EmptyState
+          title="No collection journey available"
+          description="Seeded collection data has not been configured for this preview."
+        />
+      </div>
+    );
+  }
+
   const idx = stages.indexOf(truck.stage);
 
   return (

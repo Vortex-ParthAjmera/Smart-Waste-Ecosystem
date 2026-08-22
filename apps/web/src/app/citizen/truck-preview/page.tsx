@@ -2,6 +2,7 @@
 
 import { PageHeader } from "@/components/PageHeader";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { EmptyState } from "@/components/StateViews";
 import { Card, CardContent } from "@/components/ui/card";
 import { apiClient } from "@/lib/api-client";
 import { Truck as TruckIcon } from "lucide-react";
@@ -11,6 +12,20 @@ export default function CitizenTruckPreviewPage() {
   const trucks = apiClient.listTrucks();
   const stages = apiClient.collectionStages();
   const truck = trucks[0];
+
+  if (!truck) {
+    return (
+      <div className="space-y-3">
+        <PageHeader title="Truck & ETA Preview" />
+        <PreviewBanner />
+        <EmptyState
+          title="No preview truck available"
+          description="Seeded collection data has not been configured for this preview."
+        />
+      </div>
+    );
+  }
+
   const stageIdx = stages.indexOf(truck.stage);
 
   return (

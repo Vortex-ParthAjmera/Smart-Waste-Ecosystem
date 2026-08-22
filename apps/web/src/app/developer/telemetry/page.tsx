@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { DevCard, DevSectionLabel } from "@/components/developer/DevCard";
+import { LoadingSkeleton } from "@/components/StateViews";
 import { apiClient } from "@/lib/api-client";
 import { formatDateTime } from "@/lib/utils";
 
@@ -24,22 +25,23 @@ function makeReading(id: number): Reading {
     { label: "Moisture", value: (10 + Math.random() * 55).toFixed(1), unit: "%", calibration: "cal-2026.01" },
     { label: "GPS latitude", value: (22.7196 + (Math.random() - 0.5) * 0.001).toFixed(6), unit: "deg", calibration: "n/a" },
     { label: "GPS longitude", value: (75.8577 + (Math.random() - 0.5) * 0.001).toFixed(6), unit: "deg", calibration: "n/a" },
-  ];
-  const t = templates[id % templates.length];
+  ] as const;
+  const t = templates[id % templates.length] ?? templates[0];
   return {
     id,
     ...t,
     quality: Math.random() > 0.85 ? "DEGRADED" : "GOOD",
     timestamp: new Date().toISOString(),
-    eventSource: "HARDWARE",
+    eventSource: "SIMULATED",
   };
 }
 
 export default function TelemetryPage() {
-  const [readings, setReadings] = useState<Reading[]>(() => Array.from({ length: 8 }, (_, i) => makeReading(i)));
+  const [readings, setReadings] = useState<Reading[]>([]);
   const device = apiClient.getDeviceByCode("ESP32-001")!;
 
   useEffect(() => {
+    setReadings(Array.from({ length: 8 }, (_, i) => makeReading(i)));
     const interval = setInterval(() => {
       setReadings((prev) => [makeReading(Date.now()), ...prev].slice(0, 30));
     }, 1800);
@@ -51,22 +53,26 @@ export default function TelemetryPage() {
       <PageHeader title="Raw Telemetry" description={`Live simulated feed from ${device.deviceCode}`} className="text-slate-100" />
       <DevSectionLabel>Scrolling feed</DevSectionLabel>
       <div className="max-h-[70vh] space-y-1.5 overflow-y-auto pr-1">
-        {readings.map((r) => (
-          <DevCard key={r.id} className="flex items-center justify-between py-2">
-            <div>
-              <p className="text-xs font-medium text-slate-100">{r.label}</p>
-              <p className="text-[10px] text-slate-500">calibration {r.calibration} · {r.eventSource}</p>
-            </div>
-            <div className="text-right">
-              <p className="mono-tabular text-sm text-slate-100">
-                {r.value} <span className="text-[10px] text-slate-500">{r.unit}</span>
-              </p>
-              <p className={r.quality === "GOOD" ? "text-[10px] text-emerald-400" : "text-[10px] text-amber-400"}>
-                {r.quality} · {formatDateTime(r.timestamp)}
-              </p>
-            </div>
-          </DevCard>
-        ))}
+        {readings.length === 0 ? (
+          <LoadingSkeleton rows={8} />
+        ) : (
+          readings.map((r) => (
+            <DevCard key={r.id} className="flex items-center justify-between py-2">
+              <div>
+                <p className="text-xs font-medium text-slate-100">{r.label}</p>
+                <p className="text-[10px] text-slate-500">calibration {r.calibration} · {r.eventSource}</p>
+              </div>
+              <div className="text-right">
+                <p className="mono-tabular text-sm text-slate-100">
+                  {r.value} <span className="text-[10px] text-slate-500">{r.unit}</span>
+                </p>
+                <p className={r.quality === "GOOD" ? "text-[10px] text-emerald-400" : "text-[10px] text-amber-400"}>
+                  {r.quality} · {formatDateTime(r.timestamp)}
+                </p>
+              </div>
+            </DevCard>
+          ))
+        )}
       </div>
     </div>
   );

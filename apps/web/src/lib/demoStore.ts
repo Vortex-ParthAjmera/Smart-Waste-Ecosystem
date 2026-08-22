@@ -63,10 +63,11 @@ export function getFixtures() {
 let counter = 1;
 
 export function injectTestEvent(fixtureId: string): DisposalEvent {
-  const fx = FIXTURES.find((f) => f.id === fixtureId) ?? FIXTURES[0];
+  const fx = FIXTURES.find((f) => f.id === fixtureId);
+  if (!fx) throw new Error(`Unknown demo fixture: ${fixtureId}`);
   const now = new Date().toISOString();
   const eventId = `evt_sim_${Date.now()}_${counter++}`;
-  const pointsAwarded = !fx.correct ? -10 : fx.category === "UNKNOWN" ? 0 : 10;
+  const pointsAwarded = !fx.correct || fx.category === "UNKNOWN" ? 0 : 10;
 
   const event: DisposalEvent = {
     eventId,

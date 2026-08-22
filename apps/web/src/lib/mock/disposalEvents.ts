@@ -46,7 +46,9 @@ function makeSeededEvent(i: number, opts: {
   reasonPlain?: string;
   moistureQuality?: "GOOD" | "DEGRADED" | "MISSING";
 }): DisposalEvent {
-  const item = WASTE_ITEMS[opts.itemIdx % WASTE_ITEMS.length];
+  const fallbackItem = WASTE_ITEMS[0];
+  if (!fallbackItem) throw new Error("Waste item fixture catalog is empty");
+  const item = WASTE_ITEMS[opts.itemIdx % WASTE_ITEMS.length] ?? fallbackItem;
   const ts = iso(opts.daysAgo, opts.hour, opts.minute);
   return {
     eventId: `evt_seed_${String(i).padStart(3, "0")}`,
@@ -75,8 +77,8 @@ function makeSeededEvent(i: number, opts: {
     decisionState: opts.decisionState,
     transportState: "ACKED",
     pointsAwarded: opts.points,
-    reasonCode: opts.reasonCode,
-    reasonPlain: opts.reasonPlain,
+    ...(opts.reasonCode === undefined ? {} : { reasonCode: opts.reasonCode }),
+    ...(opts.reasonPlain === undefined ? {} : { reasonPlain: opts.reasonPlain }),
   };
 }
 
