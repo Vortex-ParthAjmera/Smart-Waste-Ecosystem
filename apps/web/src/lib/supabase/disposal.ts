@@ -253,7 +253,7 @@ export async function getCitizenEvents(
   const events = data as DisposalEvent[];
   const hasMore = events.length > limit;
   const trimmed = hasMore ? events.slice(0, limit) : events;
-  const nextCursor = hasMore && trimmed.length > 0 ? trimmed[trimmed.length - 1].occurred_at : null;
+  const nextCursor = hasMore && trimmed.length > 0 ? trimmed[trimmed.length - 1]!.occurred_at : null;
 
   return { data: trimmed, nextCursor };
 }
@@ -279,7 +279,7 @@ export async function getMunicipalEvents(
   const events = data as DisposalEvent[];
   const hasMore = events.length > limit;
   const trimmed = hasMore ? events.slice(0, limit) : events;
-  const nextCursor = hasMore && trimmed.length > 0 ? trimmed[trimmed.length - 1].created_at : null;
+  const nextCursor = hasMore && trimmed.length > 0 ? trimmed[trimmed.length - 1]!.created_at : null;
 
   return { data: trimmed, nextCursor };
 }

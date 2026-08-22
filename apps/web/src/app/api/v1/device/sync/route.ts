@@ -21,8 +21,8 @@ import { createReviewCase } from '@/lib/supabase/reviews';
 import { createPointTransaction, hasAwardForEvent } from '@/lib/supabase/points';
 import { auditLog } from '@/lib/domain/audit';
 import { claimKey, completeKey, hashBody } from '@/lib/domain/idempotency';
-import { evaluate, RULESET_VERSION } from '@sgv/rules-engine';
-import type { EvaluationInput } from '@sgv/rules-engine';
+import { evaluateDisposal, RULESET_VERSION } from '@sgv/rules-engine';
+import type { RuleInput } from '@sgv/rules-engine';
 import { DeviceSyncSchema } from '@/lib/validation/requests';
 import {
   generateRequestId,
@@ -76,9 +76,8 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     // 6. Claim ingest message (atomic — prevents duplicate processing)
-    let ingestMsg;
     try {
-      ingestMsg = await claimIngestMessage({
+      await claimIngestMessage({
         messageId: deviceMsg.messageId,
         gatewayId: gateway.gatewayId,
         deviceId: device.id,
@@ -106,41 +105,51 @@ export async function POST(request: Request): Promise<Response> {
     const location = (payload.location ?? {}) as Record<string, unknown>;
 
     // 9. Create disposal event
-    const event = await createDisposalEvent({
+    const eventInput: Parameters<typeof createDisposalEvent>[0] = {
       eventId: payload.eventId as string,
       sourceMessageId: deviceMsg.messageId,
-      sessionId: sessionId ?? undefined,
       citizenId,
       deviceId: device.id,
       eventSource: (payload.eventSource as string) || 'HARDWARE',
       selectedCompartment: (payload.selectedCompartment as string) || 'DRY',
       processingState: input.edgeProcessing.processingState,
       decisionState: 'CAPTURED',
-      latitude: location.latitude as number | undefined,
-      longitude: location.longitude as number | undefined,
       locationQuality: (location.fixQuality as string) || 'NO_FIX',
       occurredAt: deviceMsg.occurredAt,
       edgeReceivedAt: input.edgeReceivedAt,
-    });
+    };
+    if (sessionId) {
+      eventInput.sessionId = sessionId;
+    }
+    if (typeof location.latitude === 'number') {
+      eventInput.latitude = location.latitude;
+    }
+    if (typeof location.longitude === 'number') {
+      eventInput.longitude = location.longitude;
+    }
+    const event = await createDisposalEvent(eventInput);
 
     // 10. Persist sensor readings
-    const sensorReadings = measurements.map((m) => ({
-      eventId: event.id,
-      componentCode: (m.componentCode as string) || 'unknown',
-      sensorCode: m.code as string,
-      numericValue: m.value as number | undefined,
-      booleanValue: m.code === 'IR_TRIGGERED' ? (m.value as boolean) : undefined,
-      unit: (m.unit as string) || 'PERCENT',
-      quality: (m.quality as string) || 'GOOD',
-      calibrationVersion: m.calibrationVersion as string | undefined,
-      capturedAt: m.capturedAt as string | undefined,
-    }));
+    const sensorReadings = measurements.map((m) => {
+      const reading: Parameters<typeof createSensorReadings>[0][number] = {
+        eventId: event.id,
+        componentCode: (m.componentCode as string) || 'unknown',
+        sensorCode: m.code as string,
+        unit: (m.unit as string) || 'PERCENT',
+        quality: (m.quality as string) || 'GOOD',
+      };
+      if (typeof m.value === 'number') reading.numericValue = m.value;
+      if (m.code === 'IR_TRIGGERED' && typeof m.value === 'boolean') reading.booleanValue = m.value;
+      if (typeof m.calibrationVersion === 'string') reading.calibrationVersion = m.calibrationVersion;
+      if (typeof m.capturedAt === 'string') reading.capturedAt = m.capturedAt;
+      return reading;
+    });
     await createSensorReadings(sensorReadings);
 
     // 11. Persist ML detection (if provided)
     const mlDetectionInput = input.edgeProcessing.mlDetection ?? null;
     if (mlDetectionInput) {
-      await createMlDetection({
+      const mlRecord: Parameters<typeof createMlDetection>[0] = {
         eventId: event.id,
         evidenceSource: mlDetectionInput.evidenceSource,
         status: mlDetectionInput.status,
@@ -148,14 +157,15 @@ export async function POST(request: Request): Promise<Response> {
         modelVersion: mlDetectionInput.modelVersion,
         weightsSha256: mlDetectionInput.weightsSha256,
         classMapVersion: mlDetectionInput.classMapVersion,
-        detectedLabel: mlDetectionInput.detectedLabel ?? undefined,
-        friendlyLabel: mlDetectionInput.friendlyLabel ?? undefined,
-        predictedCategory: mlDetectionInput.predictedCategory ?? undefined,
-        score: mlDetectionInput.score ?? undefined,
-        confidenceBand: mlDetectionInput.confidenceBand ?? undefined,
-        inferenceMs: mlDetectionInput.inferenceMs ?? undefined,
         observedAt: mlDetectionInput.observedAt,
-      });
+      };
+      if (mlDetectionInput.detectedLabel) mlRecord.detectedLabel = mlDetectionInput.detectedLabel;
+      if (mlDetectionInput.friendlyLabel) mlRecord.friendlyLabel = mlDetectionInput.friendlyLabel;
+      if (mlDetectionInput.predictedCategory) mlRecord.predictedCategory = mlDetectionInput.predictedCategory;
+      if (typeof mlDetectionInput.score === 'number') mlRecord.score = mlDetectionInput.score;
+      if (mlDetectionInput.confidenceBand) mlRecord.confidenceBand = mlDetectionInput.confidenceBand;
+      if (typeof mlDetectionInput.inferenceMs === 'number') mlRecord.inferenceMs = mlDetectionInput.inferenceMs;
+      await createMlDetection(mlRecord);
     }
 
     // 12. Run rules engine
@@ -166,36 +176,36 @@ export async function POST(request: Request): Promise<Response> {
       mlDetectionInput as { status: string; predictedCategory?: string | null; score?: number | null; evidenceSource: string } | null,
       measurements,
     );
-    const result = evaluate(rulesInput);
+    const result = evaluateDisposal(rulesInput);
 
     // 13. Persist segregation result
     await createSegregationResult({
       eventId: event.id,
       rulesetId: ruleset?.id ?? '00000000-0000-0000-0000-000000000000',
-      outcome: result.outcome,
-      suggestedSeverity: result.immediatePoints < 0 ? 'NORMAL' : 'NONE',
-      reasonCodes: result.reasons,
+      outcome: result.automatedResult,
+      suggestedSeverity: result.severeViolationEligible ? 'SEVERE' : 'NONE',
+      reasonCodes: result.reasonCodes,
       inputHash: await hashBody(rulesInput),
     });
 
     // 14. Points or review
-    if (result.outcome === 'ACCEPTED' && result.immediatePoints > 0) {
+    if (result.automatedResult === 'ACCEPTED' && result.immediatePointDelta > 0) {
       const alreadyAwarded = await hasAwardForEvent(event.id);
       if (!alreadyAwarded) {
         await createPointTransaction({
           citizenId,
           eventId: event.id,
           entryKind: 'AWARD',
-          pointsDelta: result.immediatePoints,
+          pointsDelta: result.immediatePointDelta,
           reasonCode: 'SUPPORTED_MATCH',
           idempotencyKey: crypto.randomUUID(),
         });
       }
-    } else if (result.outcome === 'FLAGGED') {
+    } else if (result.automatedResult === 'FLAGGED') {
       await createReviewCase({
         eventId: event.id,
-        reasonCodes: result.reasons,
-        suggestedSeverity: 'NONE',
+        reasonCodes: result.reasonCodes,
+        suggestedSeverity: result.severeViolationEligible ? 'SEVERE' : 'NONE',
       });
     }
 
@@ -204,7 +214,7 @@ export async function POST(request: Request): Promise<Response> {
     await updateEventState(
       event.id,
       'SEGREGATION_DECIDED',
-      result.outcome,
+      result.automatedResult,
     );
 
     // 16. Build response
@@ -215,11 +225,11 @@ export async function POST(request: Request): Promise<Response> {
       result: {
         eventId: event.id,
         processingState: 'SEGREGATION_DECIDED',
-        decisionState: result.outcome,
-        pointsDelta: result.outcome === 'ACCEPTED' ? result.immediatePoints : 0,
+        decisionState: result.automatedResult,
+        pointsDelta: result.automatedResult === 'ACCEPTED' ? result.immediatePointDelta : 0,
         verificationCaseId: null,
         rulesetVersion: RULESET_VERSION,
-        reasonCodes: result.reasons,
+        reasonCodes: result.reasonCodes,
       },
     };
 
@@ -227,7 +237,7 @@ export async function POST(request: Request): Promise<Response> {
     await completeIngestMessage(
       deviceMsg.messageId,
       'PROCESSED',
-      result.outcome,
+      result.automatedResult,
       responseData as unknown as Record<string, unknown>,
     );
 
@@ -239,8 +249,8 @@ export async function POST(request: Request): Promise<Response> {
       requestId,
       details: {
         messageId: deviceMsg.messageId,
-        outcome: result.outcome,
-        pointsDelta: result.outcome === 'ACCEPTED' ? result.immediatePoints : 0,
+        outcome: result.automatedResult,
+        pointsDelta: result.automatedResult === 'ACCEPTED' ? result.immediatePointDelta : 0,
       },
     });
 
@@ -269,48 +279,29 @@ function buildRulesInput(
     evidenceSource: string;
   } | null,
   measurements: Array<Record<string, unknown>>,
-): EvaluationInput {
+): RuleInput {
   // Extract moisture for DRY compartment
   const moistureReading = measurements.find(
     (m) => m.code === 'MOISTURE_DRY_PERCENT',
   );
 
-  return {
-    selectedCompartment: compartment as 'WET' | 'DRY',
-    irTriggered: (trigger.triggered as boolean) ?? false,
-    irQuality: ((trigger.quality as string) ?? 'MISSING') as EvaluationInput['irQuality'],
-    mlStatus: mapMlStatus(mlDetection),
-    mlCategory: (mlDetection?.predictedCategory as EvaluationInput['mlCategory']) ?? 'UNKNOWN',
-    mlScore: mlDetection?.score ?? 0,
-    dryMoisturePercent: moistureReading?.value as number | undefined,
-    dryMoistureQuality: (moistureReading?.quality as EvaluationInput['dryMoistureQuality']) ?? undefined,
-    eventSource: 'HARDWARE',
-    evidenceSource: (mlDetection?.evidenceSource as EvaluationInput['evidenceSource']) ?? 'LOCAL_LIVE',
-  };
-}
+  const triggeredCompartment = trigger.componentCode === 'ir-wet-1' ? 'WET' : trigger.componentCode === 'ir-dry-1' ? 'DRY' : null;
+  const mlStatus = mlDetection?.status === 'DETECTED' ? 'ML_RECEIVED' : 'ML_UNAVAILABLE';
 
-/**
- * Map cloud ML detection status to rules engine mlStatus.
- */
-function mapMlStatus(ml: {
-  status: string;
-  score?: number | null;
-} | null): EvaluationInput['mlStatus'] {
-  if (!ml) return 'MODEL_UNAVAILABLE';
-  switch (ml.status) {
-    case 'DETECTED':
-      return (ml.score ?? 0) >= 0.60 ? 'SUPPORTED_MATCH' : 'LOW_CONFIDENCE';
-    case 'NO_DETECTION':
-      return 'NO_DETECTION';
-    case 'MULTIPLE_CONFLICTING':
-      return 'MULTIPLE_DETECTIONS';
-    case 'UNAVAILABLE':
-      return 'MODEL_UNAVAILABLE';
-    case 'TIMED_OUT':
-      return 'TIMEOUT';
-    case 'FAILED':
-      return 'INFERENCE_ERROR';
-    default:
-      return 'MODEL_UNAVAILABLE';
-  }
+  return {
+    eventId: 'cloud-device-sync',
+    selectedCompartment: compartment as 'WET' | 'DRY',
+    triggeredCompartment,
+    eventSource: 'HARDWARE',
+    evidenceSource: (mlDetection?.evidenceSource as RuleInput['evidenceSource']) ?? 'LOCAL_LIVE',
+    sessionValid: true,
+    triggerQualityGood: Boolean(trigger.triggered) && trigger.quality === 'GOOD',
+    sensorEvidenceGood: !moistureReading || moistureReading.quality === 'GOOD',
+    safetyHold: false,
+    mlStatus,
+    mlCategory: (mlDetection?.predictedCategory as RuleInput['mlCategory']) ?? 'UNKNOWN',
+    mlScore: mlDetection?.score ?? null,
+    conflictingObjects: mlDetection?.status === 'MULTIPLE_CONFLICTING',
+    dryMoisturePercent: typeof moistureReading?.value === 'number' ? moistureReading.value : null,
+  };
 }

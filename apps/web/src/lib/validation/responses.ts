@@ -35,8 +35,15 @@ export function errorResponse(
   retryable?: boolean,
   requestId?: string,
 ): Response {
+  const error: ApiError['error'] = { code, message };
+  if (details !== undefined) {
+    error.details = details;
+  }
+  if (retryable !== undefined) {
+    error.retryable = retryable;
+  }
   const body: ApiError = {
-    error: { code, message, details, retryable },
+    error,
     meta: { requestId: requestId ?? generateRequestId() },
   };
   return Response.json(body, { status: httpStatus });
@@ -51,14 +58,17 @@ export function paginatedResponse<T>(
   },
   requestId?: string,
 ): Response {
+  const meta: PaginatedResponse<T>['meta'] = {
+    requestId: requestId ?? generateRequestId(),
+    limit: opts.limit,
+    hasMore: opts.hasMore,
+  };
+  if (opts.nextCursor) {
+    meta.cursor = opts.nextCursor;
+  }
   const body: PaginatedResponse<T> = {
     data,
-    meta: {
-      requestId: requestId ?? generateRequestId(),
-      cursor: opts.nextCursor ?? undefined,
-      limit: opts.limit,
-      hasMore: opts.hasMore,
-    },
+    meta,
   };
   return Response.json(body, { status: 200 });
 }

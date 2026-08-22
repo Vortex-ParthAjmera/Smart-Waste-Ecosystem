@@ -13,15 +13,24 @@ export async function auditLog(opts: {
   details?: Record<string, unknown>;
 }): Promise<void> {
   try {
-    await createAuditLog({
-      actorId: opts.actorId,
+    const auditEntry: {
+      actorId?: string;
+      action: string;
+      resourceType: string;
+      resourceId?: string;
+      requestId?: string;
+      source: string;
+      details?: Record<string, unknown>;
+    } = {
       action: opts.action,
       resourceType: opts.resourceType,
-      resourceId: opts.resourceId,
-      requestId: opts.requestId,
-      source: AUDIT_SOURCE,
-      details: opts.details,
-    });
+      source: AUDIT_SOURCE
+    };
+    if (opts.actorId) auditEntry.actorId = opts.actorId;
+    if (opts.resourceId) auditEntry.resourceId = opts.resourceId;
+    if (opts.requestId) auditEntry.requestId = opts.requestId;
+    if (opts.details) auditEntry.details = opts.details;
+    await createAuditLog(auditEntry);
   } catch {
     // Audit failure must not block the request — log silently
   }

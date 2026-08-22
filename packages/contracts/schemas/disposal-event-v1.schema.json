@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sgv.example/contracts/disposal-event-v1.schema.json",
+  "title": "SGV disposal event LAN message v1.1",
+  "type": "object",
+  "required": ["schemaVersion", "messageId", "messageType", "deviceCode", "bootId", "sequence", "occurredAt", "timeQuality", "firmwareVersion", "payload", "extensions"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "1.1" },
+    "messageId": { "type": "string", "format": "uuid" },
+    "messageType": { "const": "DISPOSAL_EVENT_V1" },
+    "deviceCode": { "type": "string", "pattern": "^ESP32-[0-9]{3}$" },
+    "bootId": { "type": "string", "format": "uuid" },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "timeQuality": { "enum": ["GPS", "DEVICE_SYNCED", "EDGE_ASSIGNED", "UNKNOWN"] },
+    "firmwareVersion": { "type": "string", "minLength": 1 },
+    "payload": {
+      "type": "object",
+      "required": ["eventId", "sessionId", "eventSource", "selectedCompartment", "trigger", "measurements", "location"],
+      "additionalProperties": false,
+      "properties": {
+        "eventId": { "type": "string", "format": "uuid" },
+        "sessionId": { "type": "string", "format": "uuid" },
+        "eventSource": { "enum": ["HARDWARE", "RECORDED_HARDWARE", "SIMULATED", "SEEDED"] },
+        "selectedCompartment": { "enum": ["WET", "DRY"] },
+        "trigger": {
+          "type": "object",
+          "required": ["componentCode", "triggered", "quality", "capturedAt"],
+          "additionalProperties": false,
+          "properties": {
+            "componentCode": { "enum": ["ir-wet-1", "ir-dry-1"] },
+            "triggered": { "type": "boolean" },
+            "quality": { "enum": ["GOOD", "DEGRADED", "MISSING", "FAILED", "UNKNOWN"] },
+            "capturedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "measurements": { "type": "array", "maxItems": 8 },
+        "location": {
+          "type": "object",
+          "required": ["fixQuality"],
+          "additionalProperties": false,
+          "properties": {
+            "fixQuality": { "enum": ["FIX_3D", "FIX_2D", "NO_FIX", "UNKNOWN"] },
+            "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+            "longitude": { "type": "number", "minimum": -180, "maximum": 180 }
+          }
+        }
+      }
+    },
+    "extensions": { "type": "object" }
+  }
+}

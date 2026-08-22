@@ -12,11 +12,15 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@sgv/contracts": "file:../../packages/contracts",
+    "@sgv/rules-engine": "file:../../packages/rules-engine",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.45.0",
+    "@types/three": "^0.185.4",
     "next": "^14.2.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "three": "^0.185.1",
     "zod": "^3.23.0"
   },
   "devDependencies": {

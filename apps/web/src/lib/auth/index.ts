@@ -61,11 +61,14 @@ export async function getAuthSession(): Promise<AuthSession> {
     }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   }
 
-  return {
+  const session: AuthSession = {
     userId: user.id,
     role: profile.app_role as AppRole,
-    email: user.email,
   };
+  if (user.email) {
+    session.email = user.email;
+  }
+  return session;
 }
 
 /**

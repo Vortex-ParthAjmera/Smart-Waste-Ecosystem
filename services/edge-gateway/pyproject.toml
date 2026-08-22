@@ -1,0 +1,21 @@
+[project]
+name = "sgv-edge-gateway"
+version = "0.1.0"
+description = "FastAPI edge gateway for Smart Waste Ecosystem"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.111,<0.113",
+  "uvicorn>=0.30,<0.31",
+  "pydantic>=2.8,<2.9",
+  "httpx>=0.27,<0.28"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.2,<9",
+  "ruff>=0.5,<0.6"
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
