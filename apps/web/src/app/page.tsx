@@ -1,6 +1,5 @@
-import { SmartWasteConsole } from "@/components/smart-waste-console";
-import { buildAppProjection } from "@/lib/domain/projections";
+import { FictionalAccounts } from "@/components/fictional-accounts";
 
 export default function HomePage() {
-  return <SmartWasteConsole projection={buildAppProjection()} />;
+  return <FictionalAccounts />;
 }

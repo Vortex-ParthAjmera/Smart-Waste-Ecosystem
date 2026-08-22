@@ -12,9 +12,9 @@ const DEVELOPER_USER_ID = "iot-admin";
 const DEVELOPER_PASSWORD = "demo-dev-2026";
 
 const LOGIN_ROLES = [
-  { id: "citizen", label: "Citizen", mark: "C" },
-  { id: "municipal", label: "Municipal", mark: "M" },
-  { id: "developer", label: "Developer", mark: "D" }
+  { id: "citizen", mark: "C" },
+  { id: "municipal", mark: "M" },
+  { id: "developer", mark: "D" }
 ] as const;
 
 export type LoginRole = (typeof LOGIN_ROLES)[number]["id"];
@@ -93,17 +93,17 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
   return (
     <main className={styles.page}>
       <header className={styles.topbar}>
-        <div className={styles.brand} aria-label="SGV 2.0 Smart Waste Ecosystem">
+        <div className={styles.brand} aria-label={`${t("brandName")} ${t("brandTagline")}`}>
           <span className={styles.brandSeal} aria-hidden="true">SGV</span>
           <span className={styles.brandText}>
-            <strong>SGV 2.0</strong>
-            <small>Smart Waste Ecosystem</small>
+            <strong>{t("brandName")}</strong>
+            <small>{t("brandTagline")}</small>
           </span>
         </div>
 
         <div className={styles.topbarActions}>
           <LanguageToggle />
-          <div className={styles.provenance} aria-label="Access environment">
+          <div className={styles.provenance} aria-label={t("accessEnvironment")}>
             <span><i className={styles.mossDot} aria-hidden="true" />{t("fictionalAccounts")}</span>
             <span><i className={styles.amberDot} aria-hidden="true" />{t("localDemoFallback")}</span>
           </div>
@@ -112,36 +112,34 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
 
       <div className={styles.layout}>
         <section className={styles.story} aria-labelledby="access-story-title">
-          <p className={styles.darkEyebrow}>Identity chain · role-scoped entry</p>
-          <h1 id="access-story-title">Every trusted record starts with the right role.</h1>
-          <p className={styles.lead}>
-            Enter the fictional SGV workspace as a citizen, municipal operator, or developer. Each route reveals only the tools that role is meant to use.
-          </p>
+          <p className={styles.darkEyebrow}>{t("identityChainEyebrow")}</p>
+          <h1 id="access-story-title">{t("loginHeroTitle")}</h1>
+          <p className={styles.lead}>{t("loginHeroLead")}</p>
 
-          <ol className={styles.accessChain} aria-label="Access verification sequence">
-            <li><span>1</span><small>IDENTITY</small></li>
-            <li><span>2</span><small>ACCESS</small></li>
-            <li><span>3</span><small>ROLE VIEW</small></li>
-            <li><span>4</span><small>AUDIT</small></li>
+          <ol className={styles.accessChain} aria-label={t("accessVerificationSequence")}>
+            <li><span>1</span><small>{t("stepIdentity")}</small></li>
+            <li><span>2</span><small>{t("stepAccess")}</small></li>
+            <li><span>3</span><small>{t("stepRoleView")}</small></li>
+            <li><span>4</span><small>{t("stepAudit")}</small></li>
           </ol>
 
-          <aside className={styles.privacyNote} aria-label="Demo privacy note">
-            <span className={styles.privacyStamp}>PRIVACY SAFE</span>
-            <p>Seeded credentials belong only to fictional rehearsal accounts—never to a real citizen, worker, or device.</p>
+          <aside className={styles.privacyNote} aria-label={t("demoPrivacyNote")}>
+            <span className={styles.privacyStamp}>{t("privacySafe")}</span>
+            <p>{t("privacyNoteBody")}</p>
           </aside>
         </section>
 
         <section className={styles.ticket} data-role={activeRole} aria-labelledby="auth-title">
           <div className={styles.ticketHeader}>
             <div>
-              <p className={styles.paperEyebrow}>Access receipt · SGV-AUTH-002</p>
+              <p className={styles.paperEyebrow}>{t("accessReceiptEyebrow")}</p>
               <h2 id="auth-title">{t("chooseAccess")}</h2>
             </div>
-            <span className={styles.demoStamp}>DEMO ACCESS</span>
+            <span className={styles.demoStamp}>{t("demoAccess")}</span>
           </div>
-          <p className={styles.ticketIntro}>Use the seeded flow that matches the dashboard you need to demonstrate.</p>
+          <p className={styles.ticketIntro}>{t("ticketIntro")}</p>
 
-          <div className={styles.roleTabs} role="tablist" aria-label="Choose an account role">
+          <div className={styles.roleTabs} role="tablist" aria-label={t("chooseAccountRole")}>
             {LOGIN_ROLES.map((role, index) => {
               const selected = activeRole === role.id;
 
@@ -180,9 +178,9 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
             <div className={styles.panelHeading}>
               <span className={styles.roleSeal} aria-hidden="true">C</span>
               <div>
-                <p className={styles.paperEyebrow}>Citizen ledger</p>
-                <h3>Sign in to your disposal record</h3>
-                <p>Review points, badges, QR access, and traceable disposal history.</p>
+                <p className={styles.paperEyebrow}>{t("citizenLedgerEyebrow")}</p>
+                <h3>{t("citizenSignInTitle")}</h3>
+                <p>{t("citizenSignInBody")}</p>
               </div>
             </div>
 
@@ -194,7 +192,7 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
               }}
             >
               <div className={styles.field}>
-                <label htmlFor="citizen-user-id">Citizen user ID</label>
+                <label htmlFor="citizen-user-id">{t("citizenUserIdLabel")}</label>
                 <input
                   aria-invalid={citizenStatus === "error"}
                   autoComplete="username"
@@ -211,7 +209,7 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="citizen-password">Citizen password</label>
+                <label htmlFor="citizen-password">{t("citizenPasswordLabel")}</label>
                 <div className={styles.passwordField}>
                   <input
                     aria-describedby={citizenStatus === "error" ? "citizen-login-status" : undefined}
@@ -222,30 +220,30 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
                       setCitizenPassword(event.target.value);
                       setCitizenStatus("idle");
                     }}
-                    placeholder="Enter citizen password"
+                    placeholder={t("citizenPasswordPlaceholder")}
                     required
                     type={showCitizenPassword ? "text" : "password"}
                     value={citizenPassword}
                   />
                   <button
-                    aria-label={showCitizenPassword ? "Hide citizen password" : "Show citizen password"}
+                    aria-label={showCitizenPassword ? t("hidePassword") : t("showPassword")}
                     aria-pressed={showCitizenPassword}
                     onClick={() => setShowCitizenPassword((visible) => !visible)}
                     type="button"
                   >
-                    {showCitizenPassword ? "Hide" : "Show"}
+                    {showCitizenPassword ? t("hidePassword") : t("showPassword")}
                   </button>
                 </div>
               </div>
 
               {citizenStatus === "error" && (
                 <p className={styles.errorStatus} id="citizen-login-status" role="alert">
-                  Invalid citizen credentials. Use the seeded citizen credentials below.
+                  {t("citizenInvalidCreds")}
                 </p>
               )}
               {citizenStatus === "success" && (
                 <p className={styles.successStatus} id="citizen-login-status" role="status">
-                  Citizen credentials accepted. Continue to the citizen dashboard.
+                  {t("citizenAcceptedCreds")}
                 </p>
               )}
 
@@ -267,23 +265,23 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
             <div className={styles.panelHeading}>
               <span className={styles.roleSeal} aria-hidden="true">M</span>
               <div>
-                <p className={styles.paperEyebrow}>Municipal review</p>
-                <h3>Continue to operator tools</h3>
-                <p>Open disposal sessions, flagged cases, and zone review workflows.</p>
+                <p className={styles.paperEyebrow}>{t("municipalReviewEyebrow")}</p>
+                <h3>{t("municipalContinueTitle")}</h3>
+                <p>{t("municipalContinueBody")}</p>
               </div>
             </div>
 
             <div className={styles.providerCard}>
               <span className={styles.googleMark} aria-hidden="true">G</span>
               <div>
-                <strong>Verified staff account</strong>
-                <p id="municipal-login-hint">This local demo mirrors Google sign-in. No real Google request is made.</p>
+                <strong>{t("verifiedStaffAccount")}</strong>
+                <p id="municipal-login-hint">{t("municipalGoogleHint")}</p>
               </div>
             </div>
 
             {municipalStatus === "success" && (
               <p className={styles.successStatus} role="status">
-                Municipal demo access accepted. Continue to operator tools.
+                {t("municipalAcceptedDemo")}
               </p>
             )}
 
@@ -299,7 +297,7 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
             {municipalStatus === "success" && (
               <Link className={styles.dashboardLink} href="/operator">{t("openMunicipalConsole")} <span aria-hidden="true">→</span></Link>
             )}
-            <p className={styles.roleHint}>Production access is restricted to verified municipal domains.</p>
+            <p className={styles.roleHint}>{t("municipalDomainHint")}</p>
           </section>
 
           <section
@@ -313,9 +311,9 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
             <div className={styles.panelHeading}>
               <span className={styles.roleSeal} aria-hidden="true">D</span>
               <div>
-                <p className={styles.paperEyebrow}>Restricted access</p>
-                <h3>IoT control console</h3>
-                <p>ESP32-001 · Edge Gateway · Model Registry</p>
+                <p className={styles.paperEyebrow}>{t("restrictedAccessEyebrow")}</p>
+                <h3>{t("iotConsoleTitle")}</h3>
+                <p>{t("iotConsoleSubtitle")}</p>
               </div>
             </div>
 
@@ -327,7 +325,7 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
               }}
             >
               <div className={styles.field}>
-                <label htmlFor="developer-user-id">Developer username</label>
+                <label htmlFor="developer-user-id">{t("developerUsernameLabel")}</label>
                 <input
                   aria-invalid={developerStatus === "error"}
                   autoComplete="username"
@@ -344,7 +342,7 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="developer-password">Developer password</label>
+                <label htmlFor="developer-password">{t("developerPasswordLabel")}</label>
                 <div className={styles.passwordField}>
                   <input
                     aria-describedby={developerStatus === "error" ? "developer-login-status" : undefined}
@@ -355,36 +353,36 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
                       setDeveloperPassword(event.target.value);
                       setDeveloperStatus("idle");
                     }}
-                    placeholder="Enter developer password"
+                    placeholder={t("developerPasswordPlaceholder")}
                     required
                     type={showDeveloperPassword ? "text" : "password"}
                     value={developerPassword}
                   />
                   <button
-                    aria-label={showDeveloperPassword ? "Hide developer password" : "Show developer password"}
+                    aria-label={showDeveloperPassword ? t("hidePassword") : t("showPassword")}
                     aria-pressed={showDeveloperPassword}
                     onClick={() => setShowDeveloperPassword((visible) => !visible)}
                     type="button"
                   >
-                    {showDeveloperPassword ? "Hide" : "Show"}
+                    {showDeveloperPassword ? t("hidePassword") : t("showPassword")}
                   </button>
                 </div>
               </div>
 
               {developerStatus === "error" && (
                 <p className={styles.errorStatus} id="developer-login-status" role="alert">
-                  401 Unauthorized — simulated invalid credentials blocked.
+                  {t("developerInvalidCreds")}
                 </p>
               )}
               {developerStatus === "success" && (
                 <p className={styles.successStatus} id="developer-login-status" role="status">
-                  Developer credentials accepted. Continue to the IoT console.
+                  {t("developerAcceptedCreds")}
                 </p>
               )}
 
               <button className={styles.primaryButton} type="submit">{t("developerSignIn")}</button>
               <button className={styles.invalidDemoButton} onClick={() => setDeveloperStatus("error")} type="button">
-                Try invalid credentials demo
+                {t("tryInvalidCredsDemo")}
               </button>
               {developerStatus === "success" && (
                 <Link className={styles.dashboardLink} href="/developer">{t("openDeveloperConsole")} <span aria-hidden="true">→</span></Link>
@@ -394,20 +392,24 @@ export function FictionalAccounts({ initialRole = "citizen" }: FictionalAccounts
 
           <aside className={styles.credentials} aria-labelledby="credentials-title">
             <div className={styles.credentialsHeader}>
-              <p className={styles.paperEyebrow}>Seeded / local</p>
-              <span>REHEARSAL RECEIPT</span>
+              <p className={styles.paperEyebrow}>{t("seededLocalEyebrow")}</p>
+              <span>{t("rehearsalReceipt")}</span>
             </div>
-            <h3 id="credentials-title">Fictional credentials for judging</h3>
+            <h3 id="credentials-title">{t("fictionalCredentialsTitle")}</h3>
             <dl>
-              <div><dt>Citizen user ID</dt><dd>{CITIZEN_USER_ID}</dd></div>
-              <div><dt>Citizen password</dt><dd>{CITIZEN_PASSWORD}</dd></div>
-              <div><dt>Municipal option</dt><dd>Continue with Google demo</dd></div>
-              <div><dt>Developer user ID</dt><dd>{DEVELOPER_USER_ID}</dd></div>
-              <div><dt>Developer password</dt><dd>{DEVELOPER_PASSWORD}</dd></div>
+              <div><dt>{t("citizenUserIdLabel")}</dt><dd>{CITIZEN_USER_ID}</dd></div>
+              <div><dt>{t("citizenPasswordLabel")}</dt><dd>{CITIZEN_PASSWORD}</dd></div>
+              <div><dt>{t("municipalOptionLabel")}</dt><dd>{t("continueWithGoogleDemo")}</dd></div>
+              <div><dt>{t("developerUsernameLabel")}</dt><dd>{DEVELOPER_USER_ID}</dd></div>
+              <div><dt>{t("developerPasswordLabel")}</dt><dd>{DEVELOPER_PASSWORD}</dd></div>
             </dl>
           </aside>
         </section>
       </div>
+
+      <p className={styles.productViewLink}>
+        <Link href="/console">{t("backToProductView")} <span aria-hidden="true">→</span></Link>
+      </p>
     </main>
   );
 }
