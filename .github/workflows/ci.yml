@@ -1,0 +1,175 @@
+name: CI — Data, QA, Seed, Tests
+
+on:
+  push:
+    branches:
+      - team/bhumika-singh-rawat-data-qa
+      - integration
+  pull_request:
+    branches:
+      - integration
+
+env:
+  NODE_VERSION: "20"
+  SUPABASE_VERSION: "1.190.0"
+
+jobs:
+  # ============================================================
+  # Job 1: Lint and typecheck (root-level)
+  # ============================================================
+  lint-typecheck:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm run typecheck --if-present
+
+  # ============================================================
+  # Job 2: Database schema and seed tests
+  # ============================================================
+  db-tests:
+    name: Database Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: supabase/postgres:15.6.1
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        run: |
+          curl -sSL https://github.com/supabase/cli/releases/download/v${{ env.SUPABASE_VERSION }}/supabase_${{ env.SUPABASE_VERSION }}_linux_amd64.tar.gz | tar xz
+          sudo mv supabase /usr/local/bin/
+
+      - name: Reset database (apply all migrations)
+        run: supabase db reset --db-url postgresql://postgres:postgres@localhost:5432/postgres
+        env:
+          SUPABASE_PROJECT_REF: local
+
+      - name: Run schema constraint tests
+        run: psql postgresql://postgres:postgres@localhost:5432/postgres -f supabase/tests/01_schema_constraints.sql
+
+      - name: Run seed reconciliation tests
+        run: psql postgresql://postgres:postgres@localhost:5432/postgres -f supabase/tests/02_seed_reconciliation.sql
+
+      - name: Run ledger and fairness tests
+        run: psql postgresql://postgres:postgres@localhost:5432/postgres -f supabase/tests/03_ledger_fairness.sql
+
+  # ============================================================
+  # Job 3: Build verification (ensures project builds)
+  # ============================================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build --if-present
+
+  # ============================================================
+  # Job 4: Secret scan (no secrets in diff)
+  # ============================================================
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for common secrets in diff
+        run: |
+          echo "Scanning for potential secrets..."
+          if git diff --cached --diff-filter=ACMR -U0 | grep -iE '(password|secret|api_key|token|private_key)\s*[:=]\s*["\x27][^\s]{8,}' | grep -v 'placeholder' | grep -v 'example' | grep -v 'YOUR_' | grep -v 'xxx'; then
+            echo "WARNING: Potential secrets detected in diff!"
+            exit 1
+          fi
+          echo "No secrets detected."
+
+  # ============================================================
+  # Job 5: Database seed determinism test
+  # ============================================================
+  seed-determinism:
+    name: Seed Determinism
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: supabase/postgres:15.6.1
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        run: |
+          curl -sSL https://github.com/supabase/cli/releases/download/v${{ env.SUPABASE_VERSION }}/supabase_${{ env.SUPABASE_VERSION }}_linux_amd64.tar.gz | tar xz
+          sudo mv supabase /usr/local/bin/
+
+      - name: Reset and seed (run 1)
+        run: supabase db reset --db-url postgresql://postgres:postgres@localhost:5432/postgres
+        env:
+          SUPABASE_PROJECT_REF: local
+
+      - name: Capture state after run 1
+        run: |
+          psql postgresql://postgres:postgres@localhost:5432/postgres -t -A -c "
+            SELECT jsonb_build_object(
+              'events', (SELECT count(*) FROM public.disposal_events),
+              'citizens', (SELECT count(*) FROM public.citizens),
+              'transactions', (SELECT count(*) FROM public.point_transactions),
+              'balance_primary', public.get_citizen_balance('b0000000-0000-0000-0000-000000000001'),
+              'reconciliation', public.verify_seed_reconciliation()
+            )
+          " > /tmp/state1.json
+
+      - name: Reset and seed (run 2 — determinism check)
+        run: supabase db reset --db-url postgresql://postgres:postgres@localhost:5432/postgres
+        env:
+          SUPABASE_PROJECT_REF: local
+
+      - name: Capture state after run 2
+        run: |
+          psql postgresql://postgres:postgres@localhost:5432/postgres -t -A -c "
+            SELECT jsonb_build_object(
+              'events', (SELECT count(*) FROM public.disposal_events),
+              'citizens', (SELECT count(*) FROM public.citizens),
+              'transactions', (SELECT count(*) FROM public.point_transactions),
+              'balance_primary', public.get_citizen_balance('b0000000-0000-0000-0000-000000000001'),
+              'reconciliation', public.verify_seed_reconciliation()
+            )
+          " > /tmp/state2.json
+
+      - name: Compare states (must be identical)
+        run: |
+          if ! diff /tmp/state1.json /tmp/state2.json; then
+            echo "FAIL: Seed is not deterministic! States differ between runs."
+            exit 1
+          fi
+          echo "PASS: Seed is deterministic across two runs."

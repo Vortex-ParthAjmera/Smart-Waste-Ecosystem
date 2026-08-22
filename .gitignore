@@ -1,0 +1,81 @@
+# ============================================================
+# Smart Waste Ecosystem — .gitignore
+# ============================================================
+
+# --- Environment and secrets ---
+.env
+.env.*
+!.env.example
+!.env*.example
+
+# --- Node ---
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# --- Edge SQLite (runtime data) ---
+*.db
+*.db-wal
+*.db-shm
+
+# --- Model weights and binaries ---
+*.onnx
+*.pt
+*.pth
+*.bin
+*.weights
+*.tflite
+services/edge-gateway/models/*.bin
+services/edge-gateway/models/*.onnx
+services/edge-gateway/models/*.pt
+
+# --- Camera and frame artifacts ---
+*.jpg
+*.jpeg
+*.png
+*.bmp
+captures/
+*.raw
+
+# --- PlatformIO ---
+firmware/esp32/.pio/
+firmware/esp32/.pioenvs/
+firmware/esp32/.piolibdeps/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Supabase local ---
+supabase/.temp/
+supabase/.branches/
+
+# --- Test artifacts ---
+coverage/
+*.lcov
+test-results/
+playwright-report/
+
+# --- Freebuff ---
+.freebuff/
+
+# --- Misc ---
+*.log
+*.tmp

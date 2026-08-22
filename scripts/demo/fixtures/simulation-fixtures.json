@@ -1,0 +1,206 @@
+{
+  "$schema": "simulation-fixtures-v1",
+  "version": "1.0.0",
+  "description": "Allowlisted fixtures for developer simulation endpoint. Each fixture maps to fixed fictional device, citizen, sensor values, ML outcome, and expected rules result.",
+  "fixtures": [
+    {
+      "fixtureId": "dry-bottle-correct-v1",
+      "label": "Correct dry disposal — plastic bottle",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 41.2,
+        "moistureDryPercent": 22.8,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "bottle",
+        "friendlyLabel": "Plastic Bottle",
+        "predictedCategory": "DRY",
+        "score": 0.96,
+        "confidenceBand": "HIGH"
+      },
+      "expectedOutcome": "ACCEPTED",
+      "expectedPoints": 10,
+      "expectedReasonCodes": ["SUPPORTED_CATEGORY_MATCH", "DRY_MOISTURE_NORMAL"]
+    },
+    {
+      "fixtureId": "wet-food-correct-v1",
+      "label": "Correct wet disposal — food waste",
+      "category": "WET",
+      "selectedCompartment": "WET",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillWetPercent": 35.7,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "food_waste",
+        "friendlyLabel": "Food Scraps",
+        "predictedCategory": "WET",
+        "score": 0.89,
+        "confidenceBand": "HIGH"
+      },
+      "expectedOutcome": "ACCEPTED",
+      "expectedPoints": 10,
+      "expectedReasonCodes": ["SUPPORTED_CATEGORY_MATCH", "WET_COMPARTMENT_MATCH"]
+    },
+    {
+      "fixtureId": "dry-low-confidence-v1",
+      "label": "Dry disposal with low ML confidence",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 38.5,
+        "moistureDryPercent": 19.7,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "unknown_item",
+        "friendlyLabel": "Unknown Item",
+        "predictedCategory": "DRY",
+        "score": 0.45,
+        "confidenceBand": "LOW"
+      },
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0,
+      "expectedReasonCodes": ["LOW_CONFIDENCE"]
+    },
+    {
+      "fixtureId": "dry-environmental-wetting-v1",
+      "label": "Dry item with elevated moisture (>45%)",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 42.0,
+        "moistureDryPercent": 52.3,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "paper",
+        "friendlyLabel": "Paper",
+        "predictedCategory": "DRY",
+        "score": 0.82,
+        "confidenceBand": "MEDIUM"
+      },
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0,
+      "expectedReasonCodes": ["ENVIRONMENTAL_WETTING_SUSPECTED"]
+    },
+    {
+      "fixtureId": "dry-wet-in-dry-severe-v1",
+      "label": "Severe wet-in-dry mismatch",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 44.0,
+        "moistureDryPercent": 61.2,
+        "gpsFixQuality": "GPS_2D"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "food_waste",
+        "friendlyLabel": "Food Scraps",
+        "predictedCategory": "WET",
+        "score": 0.94,
+        "confidenceBand": "HIGH"
+      },
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0,
+      "expectedReasonCodes": ["SEVERE_WET_IN_DRY", "HIGH_MOISTURE"]
+    },
+    {
+      "fixtureId": "dry-paper-normal-v1",
+      "label": "Normal dry disposal — paper",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 28.4,
+        "moistureDryPercent": 15.3,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "paper",
+        "friendlyLabel": "Paper",
+        "predictedCategory": "DRY",
+        "score": 0.78,
+        "confidenceBand": "MEDIUM"
+      },
+      "expectedOutcome": "ACCEPTED",
+      "expectedPoints": 10,
+      "expectedReasonCodes": ["SUPPORTED_CATEGORY_MATCH", "DRY_MOISTURE_NORMAL"]
+    },
+    {
+      "fixtureId": "ml-unavailable-v1",
+      "label": "Model unavailable — fallback",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 30.0,
+        "moistureDryPercent": 20.0,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "UNAVAILABLE",
+        "detectedLabel": null,
+        "friendlyLabel": null,
+        "predictedCategory": "UNKNOWN",
+        "score": null,
+        "confidenceBand": null
+      },
+      "expectedOutcome": "FLAGGED",
+      "expectedPoints": 0,
+      "expectedReasonCodes": ["MODEL_UNAVAILABLE"]
+    },
+    {
+      "fixtureId": "dry-glass-correct-v1",
+      "label": "Correct dry disposal — glass bottle",
+      "category": "DRY",
+      "selectedCompartment": "DRY",
+      "eventSource": "SIMULATED",
+      "evidenceSource": "SIMULATED",
+      "sensorValues": {
+        "irTriggered": true,
+        "fillDryPercent": 30.5,
+        "moistureDryPercent": 5.1,
+        "gpsFixQuality": "NO_FIX"
+      },
+      "mlDetection": {
+        "status": "DETECTED",
+        "detectedLabel": "glass",
+        "friendlyLabel": "Glass Bottle",
+        "predictedCategory": "DRY",
+        "score": 0.95,
+        "confidenceBand": "HIGH"
+      },
+      "expectedOutcome": "ACCEPTED",
+      "expectedPoints": 10,
+      "expectedReasonCodes": ["SUPPORTED_CATEGORY_MATCH", "DRY_MOISTURE_NORMAL"]
+    }
+  ]
+}

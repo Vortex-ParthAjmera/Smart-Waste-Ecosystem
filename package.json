@@ -1,0 +1,28 @@
+{
+  "name": "smart-waste-ecosystem",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Smart Waste Ecosystem — SGV 2.0 hackathon prototype",
+  "scripts": {
+    "lint": "echo 'Lint not yet scaffolded'",
+    "typecheck": "echo 'Typecheck not yet scaffolded'",
+    "test": "vitest run",
+    "test:contract": "vitest run tests/contract/",
+    "test:edge": "echo 'Edge tests not yet scaffolded — run: python -m pytest services/edge-gateway/tests'",
+    "test:firmware": "echo 'Firmware tests not yet scaffolded — run: pio test -d firmware/esp32'",
+    "test:db": "bash scripts/verification/verify-release.sh",
+    "test:e2e": "echo 'E2E tests not yet scaffolded — run: npx playwright test'",
+    "build": "echo 'Build not yet scaffolded'",
+    "verify": "npm run test:db",
+    "db:reset": "bash scripts/demo/reset/reset-db.sh",
+    "db:seed": "bash scripts/demo/seed/run-seed.sh",
+    "db:test": "npm run test:db"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT"
+}
