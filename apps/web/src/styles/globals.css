@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ---- Brand design tokens (Tailwind v4 theme) ----
    Powers the legacy citizen/municipal/developer screens (bg-brand-primary,
@@ -31,6 +32,41 @@
   --color-muted-foreground: #64748b;
 
   --radius: 0.75rem;
+
+  color-scheme: light;
+}
+
+/* Dark variant of the same brand tokens, toggled by adding `.dark` to <html>.
+   Every existing "bg-brand-", "text-foreground", etc. class across the
+   citizen, municipal, and developer screens re-themes automatically. */
+.dark {
+  --background: #0b1512;
+  --foreground: #eef3ee;
+
+  --color-primary: #22c55e;
+  --color-primary-dark: #16a34a;
+  --color-primary-light: #14532d;
+
+  --color-gold: #f2b453;
+  --color-gold-light: #3f2c08;
+  --color-gold-strong: #fbbf24;
+
+  --color-wet: #22d3ee;
+  --color-wet-light: #083344;
+  --color-dry: #f2b453;
+  --color-dry-light: #3f2c08;
+
+  --color-danger: #f87171;
+  --color-danger-light: #3f1414;
+  --color-warning: #f2b453;
+  --color-warning-light: #3f2c08;
+
+  --color-surface: #121e1a;
+  --color-surface-muted: #182521;
+  --color-border: #24352f;
+  --color-muted-foreground: #93a49c;
+
+  color-scheme: dark;
 }
 
 @theme inline {
