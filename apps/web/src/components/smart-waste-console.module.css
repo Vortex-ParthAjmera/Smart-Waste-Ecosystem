@@ -164,6 +164,33 @@
 .logs span small { color: var(--soft); font-size: .8rem; }
 .logs time { color: var(--soft); font-family: var(--mono); font-size: .64rem; }
 
+.alert { display: flex; align-items: center; gap: 14px; border: 1px solid #e4bd7c; border-radius: 10px; background: #fbf0dc; margin-bottom: 28px; padding: 16px 20px; }
+.alert > span { flex: 0 0 auto; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #8b571d; background: #f4dfb2; font-family: var(--mono); font-size: .9rem; font-weight: 700; }
+.alert h3 { margin: 0 0 2px; font-family: var(--display); font-size: .95rem; color: #6e4416; }
+.alert p { margin: 0; color: #8b571d; font-family: var(--mono); font-size: .68rem; }
+
+.mixRow { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.mixTrack { flex: 1; height: 8px; overflow: hidden; border-radius: 99px; background: var(--paper-dim); display: flex; }
+.mixWet { height: 100%; background: var(--steel); }
+.mixDry { height: 100%; background: var(--moss); }
+.mixLegend { display: flex; justify-content: space-between; margin-top: 8px; color: var(--soft); font-family: var(--mono); font-size: .62rem; text-transform: uppercase; }
+.mixLegend i { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; }
+.mixLegend i.mixWet { background: var(--steel); }
+.mixLegend i.mixDry { background: var(--moss); }
+
+.discountRow { display: flex; align-items: baseline; gap: 10px; margin-top: 16px; }
+.discountRow strong { font-family: var(--display); font-size: 2rem; font-weight: 600; color: var(--moss-deep); }
+.discountRow span { color: var(--soft); font-family: var(--mono); font-size: .68rem; text-transform: uppercase; }
+.cessLine { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding: 9px 0; font-family: var(--mono); font-size: .72rem; }
+.cessLine span:first-child { color: var(--soft); }
+.redeemButton { min-height: 38px; margin-top: 14px; border: 0; border-radius: 7px; padding: 0 16px; color: var(--paper); background: var(--moss); cursor: pointer; font-family: inherit; font-size: .78rem; font-weight: 700; }
+.redeemButton:hover { background: var(--moss-deep); }
+.redeemButton:disabled { cursor: default; background: var(--soft); opacity: .7; }
+.redeemNote { margin: 10px 0 0; color: var(--soft); font-family: var(--mono); font-size: .6rem; }
+
+.backLink { color: rgba(246, 240, 226, .78); font-family: var(--mono); font-size: .74rem; text-decoration: none; }
+.backLink:hover { color: var(--paper); }
+
 @media (max-width: 980px) {
   .headerInner { flex-wrap: wrap; padding: 13px 0; }
   .tabs { order: 3; width: 100%; }

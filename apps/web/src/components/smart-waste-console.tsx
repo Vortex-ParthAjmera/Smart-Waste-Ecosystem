@@ -53,27 +53,36 @@ export function SmartWasteConsole({ projection, initialRole = "citizen", accessR
             <span className={styles.seal}>SGV</span>
             <span><strong>{t("brandName")}</strong><small>{t("brandTagline")}</small></span>
           </Link>
-          <nav className={styles.tabs} role="tablist" aria-label={t("productView")}>
-            {ROLES.map((item) => (
-              <button
-                aria-controls={`panel-${item}`}
-                aria-selected={role === item}
-                className={role === item ? styles.activeTab : styles.tab}
-                id={`role-${item}`}
-                key={item}
-                onClick={() => setRole(item)}
-                onKeyDown={(event) => moveTab(event, item)}
-                role="tab"
-                tabIndex={role === item ? 0 : -1}
-                type="button"
-              >{t(item)}</button>
-            ))}
-          </nav>
-          <div className={styles.authActions}>
-            <LanguageToggle />
-            <Link className={styles.outlineButton} href="/auth?role=municipal">{t("municipalSignIn")}</Link>
-            <Link className={styles.greenButton} href="/auth?role=citizen">{t("citizenSignIn")}</Link>
-          </div>
+          {accessRole ? (
+            <div className={styles.authActions}>
+              <Link className={styles.backLink} href="/console">{t("backToProductView")}</Link>
+              <LanguageToggle />
+            </div>
+          ) : (
+            <>
+              <nav className={styles.tabs} role="tablist" aria-label={t("productView")}>
+                {ROLES.map((item) => (
+                  <button
+                    aria-controls={`panel-${item}`}
+                    aria-selected={role === item}
+                    className={role === item ? styles.activeTab : styles.tab}
+                    id={`role-${item}`}
+                    key={item}
+                    onClick={() => setRole(item)}
+                    onKeyDown={(event) => moveTab(event, item)}
+                    role="tab"
+                    tabIndex={role === item ? 0 : -1}
+                    type="button"
+                  >{t(item)}</button>
+                ))}
+              </nav>
+              <div className={styles.authActions}>
+                <LanguageToggle />
+                <Link className={styles.outlineButton} href="/auth?role=municipal">{t("municipalSignIn")}</Link>
+                <Link className={styles.greenButton} href="/auth?role=citizen">{t("citizenSignIn")}</Link>
+              </div>
+            </>
+          )}
         </div>
         <div className={styles.legend} aria-label={t("dataProvenanceLegend")}>
           <span><i className={styles.real} />{t("truthReal")}</span>
@@ -83,23 +92,27 @@ export function SmartWasteConsole({ projection, initialRole = "citizen", accessR
       </header>
 
       <main className={styles.main} id="main-content">
-        <section aria-labelledby="role-citizen" hidden={role !== "citizen"} id="panel-citizen" role="tabpanel">
+        {accessRole ? (
+          accessRole === "municipal" ? <MunicipalView focus={focus} projection={projection} /> :
+          accessRole === "developer" ? <DeveloperView projection={projection} /> :
           <CitizenView projection={projection} />
-        </section>
-        <section aria-labelledby="role-municipal" hidden={role !== "municipal"} id="panel-municipal" role="tabpanel">
-          {accessRole === "municipal" ? <MunicipalView focus={focus} projection={projection} /> : (
-            <LockedView href="/auth?role=municipal" marker="M" title={t("municipalLockedTitle")}>
-              {t("municipalLockedBody")}
-            </LockedView>
-          )}
-        </section>
-        <section aria-labelledby="role-developer" hidden={role !== "developer"} id="panel-developer" role="tabpanel">
-          {accessRole === "developer" ? <DeveloperView projection={projection} /> : (
-            <LockedView href="/auth?role=developer" marker="D" title={t("developerLockedTitle")}>
-              {t("developerLockedBody")}
-            </LockedView>
-          )}
-        </section>
+        ) : (
+          <>
+            <section aria-labelledby="role-citizen" hidden={role !== "citizen"} id="panel-citizen" role="tabpanel">
+              <CitizenView projection={projection} />
+            </section>
+            <section aria-labelledby="role-municipal" hidden={role !== "municipal"} id="panel-municipal" role="tabpanel">
+              <LockedView href="/auth?role=municipal" marker="M" title={t("municipalLockedTitle")}>
+                {t("municipalLockedBody")}
+              </LockedView>
+            </section>
+            <section aria-labelledby="role-developer" hidden={role !== "developer"} id="panel-developer" role="tabpanel">
+              <LockedView href="/auth?role=developer" marker="D" title={t("developerLockedTitle")}>
+                {t("developerLockedBody")}
+              </LockedView>
+            </section>
+          </>
+        )}
       </main>
     </div>
   );
@@ -108,10 +121,22 @@ export function SmartWasteConsole({ projection, initialRole = "citizen", accessR
 function CitizenView({ projection }: { projection: AppProjection }) {
   const event = projection.latestEvent;
   const { t } = useLanguage();
+  const [redeemed, setRedeemed] = useState(false);
   const pointsToNext = projection.nextTierAt === null ? 0 : projection.nextTierAt - projection.balance;
   const qrCells = Array.from({ length: 81 }, (_, index) => (index * 7 + projection.citizen.householdSuffix.length * 3) % 5 !== 0);
+  const ownEventIds = new Set(projection.events.map((item) => item.eventId));
+  const disputableCase = projection.reviewCases.find((item) => item.status === "OPEN" && ownEventIds.has(item.eventId));
   return (
     <>
+      {disputableCase && (
+        <div className={styles.alert} role="status">
+          <span>!</span>
+          <div>
+            <h3>{t("disputeAlertTitle")}</h3>
+            <p>{signed(disputableCase.pointEffect)} · {friendlyReason(disputableCase.reasonCode, t)} — {t("disputeAlertBody")}</p>
+          </div>
+        </div>
+      )}
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <div className={styles.labelRow}><span className={styles.eyebrow}>{t("chainOfCustody")} · {event.eventId}</span><TruthBadge badge={event.uiTruthBadge} /></div>
@@ -133,6 +158,35 @@ function CitizenView({ projection }: { projection: AppProjection }) {
         <Stat value={pointsToNext.toString()} label={pointsToNext ? t("pointsToNextTier") : t("topSeededTierReached")} />
         <Stat value={projection.stats.pendingReviewCount.toString()} label={t("pendingReview")} />
         <Stat value={`${projection.stats.devicesOnline}/${projection.stats.totalDevices}`} label={t("componentsHealthy")} />
+      </section>
+
+      <section className={styles.twoCol}>
+        <article className={styles.card}>
+          <CardTitle kicker={t("weeklyImpactKicker")} title={t("weeklyImpactTitle")}>{null}</CardTitle>
+          <div className={styles.mixRow}>
+            <div className={styles.mixTrack}>
+              <span className={styles.mixWet} style={{ width: `${projection.wetDryMix.wetPercent}%` }} />
+              <span className={styles.mixDry} style={{ width: `${projection.wetDryMix.dryPercent}%` }} />
+            </div>
+          </div>
+          <div className={styles.mixLegend}>
+            <span><i className={styles.mixWet} />{t("wetShare")} {projection.wetDryMix.wetPercent}%</span>
+            <span><i className={styles.mixDry} />{t("dryShare")} {projection.wetDryMix.dryPercent}%</span>
+          </div>
+          <div className={styles.discountRow}><strong>{projection.accuracyScore}%</strong><span>{t("sortingAccuracy")}</span></div>
+          <div className={styles.cessLine}><span>{t("disposalsThisWeek")}</span><span>{projection.weekEventCount}</span></div>
+        </article>
+        <article className={styles.card}>
+          <CardTitle kicker={t("civicDiscountKicker")} title={t("civicDiscountTitle")}>{null}</CardTitle>
+          <div className={styles.discountRow}><strong>{projection.civicDiscount.percent}%</strong><span>{t("civicDiscountApplied")}</span></div>
+          <div className={styles.cessLine}><span>{t("civicCessBase")}</span><span>₹{projection.civicDiscount.baseCess}</span></div>
+          <div className={styles.cessLine}><span>{t("civicCessPayable")}</span><span>₹{projection.civicDiscount.payable}</span></div>
+          {redeemed ? (
+            <p className={styles.redeemNote}>{t("redeemSimulatedNote")}</p>
+          ) : (
+            <button className={styles.redeemButton} onClick={() => setRedeemed(true)} type="button">{t("redeemCreditsCta")}</button>
+          )}
+        </article>
       </section>
 
       <section className={styles.twoCol}>
