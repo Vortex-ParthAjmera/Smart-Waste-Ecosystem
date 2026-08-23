@@ -1,9 +1,24 @@
-project_id = "smart-waste-ecosystem-local"
+# Minimal Supabase CLI config. Only needed if you run `supabase start`
+# (local Docker stack). For a hosted project, `supabase link` + `db push`
+# is enough and this file just records the project id.
 
-[api]
-enabled = true
-port = 54321
+project_id = "smart-waste"
 
 [db]
 port = 54322
-major_version = 15
+major_version = 16
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+jwt_expiry = 3600
+enable_signup = true
+
+# Local-only Google provider block. The HOSTED project's Google settings are
+# configured in the Dashboard, not here.
+[auth.external.google]
+enabled = false
+client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
+redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
