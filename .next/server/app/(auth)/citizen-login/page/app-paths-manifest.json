@@ -1,0 +1,3 @@
+{
+  "/(auth)/citizen-login/page": "app/(auth)/citizen-login/page.js"
+}

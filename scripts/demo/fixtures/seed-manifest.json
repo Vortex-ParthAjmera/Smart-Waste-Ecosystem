@@ -1,9 +1,0 @@
-{
-  "commitRequired": true,
-  "mainCitizenEventCount": 20,
-  "peerCitizenCount": 4,
-  "mainCitizenSuffix": "SGV-002",
-  "containsRealPii": false,
-  "truthLabels": ["REAL", "RECORDED", "SIMULATED", "PREVIEW/SEEDED"],
-  "rulesetVersion": "rules-2.0.0"
-}

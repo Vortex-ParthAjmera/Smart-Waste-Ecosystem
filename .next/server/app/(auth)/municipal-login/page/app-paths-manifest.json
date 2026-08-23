@@ -1,0 +1,3 @@
+{
+  "/(auth)/municipal-login/page": "app/(auth)/municipal-login/page.js"
+}

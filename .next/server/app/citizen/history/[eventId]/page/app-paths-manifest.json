@@ -1,0 +1,3 @@
+{
+  "/citizen/history/[eventId]/page": "app/citizen/history/[eventId]/page.js"
+}

@@ -1,0 +1,334 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/citizen/history/[eventId]",
+      "regex": "^/citizen/history/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPeventId": "nxtPeventId"
+      },
+      "namedRegex": "^/citizen/history/(?<nxtPeventId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/developer/devices/[deviceId]",
+      "regex": "^/developer/devices/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPdeviceId": "nxtPdeviceId"
+      },
+      "namedRegex": "^/developer/devices/(?<nxtPdeviceId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/municipal/verification/[caseId]",
+      "regex": "^/municipal/verification/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcaseId": "nxtPcaseId"
+      },
+      "namedRegex": "^/municipal/verification/(?<nxtPcaseId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/disposal",
+      "regex": "^/api/disposal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/disposal(?:/)?$"
+    },
+    {
+      "page": "/api/profile",
+      "regex": "^/api/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/profile(?:/)?$"
+    },
+    {
+      "page": "/api/qr/token",
+      "regex": "^/api/qr/token(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/qr/token(?:/)?$"
+    },
+    {
+      "page": "/api/scan/resolve",
+      "regex": "^/api/scan/resolve(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/scan/resolve(?:/)?$"
+    },
+    {
+      "page": "/auth/callback",
+      "regex": "^/auth/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/callback(?:/)?$"
+    },
+    {
+      "page": "/citizen",
+      "regex": "^/citizen(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen(?:/)?$"
+    },
+    {
+      "page": "/citizen/badges",
+      "regex": "^/citizen/badges(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/badges(?:/)?$"
+    },
+    {
+      "page": "/citizen/credits",
+      "regex": "^/citizen/credits(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/credits(?:/)?$"
+    },
+    {
+      "page": "/citizen/disposal",
+      "regex": "^/citizen/disposal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/disposal(?:/)?$"
+    },
+    {
+      "page": "/citizen/history",
+      "regex": "^/citizen/history(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/history(?:/)?$"
+    },
+    {
+      "page": "/citizen/leaderboard",
+      "regex": "^/citizen/leaderboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/leaderboard(?:/)?$"
+    },
+    {
+      "page": "/citizen/more",
+      "regex": "^/citizen/more(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/more(?:/)?$"
+    },
+    {
+      "page": "/citizen/my-log",
+      "regex": "^/citizen/my\\-log(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/my\\-log(?:/)?$"
+    },
+    {
+      "page": "/citizen/profile",
+      "regex": "^/citizen/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/profile(?:/)?$"
+    },
+    {
+      "page": "/citizen/qr",
+      "regex": "^/citizen/qr(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/qr(?:/)?$"
+    },
+    {
+      "page": "/citizen/reviews",
+      "regex": "^/citizen/reviews(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/reviews(?:/)?$"
+    },
+    {
+      "page": "/citizen/truck-preview",
+      "regex": "^/citizen/truck\\-preview(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen/truck\\-preview(?:/)?$"
+    },
+    {
+      "page": "/citizen-login",
+      "regex": "^/citizen\\-login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen\\-login(?:/)?$"
+    },
+    {
+      "page": "/citizen-register",
+      "regex": "^/citizen\\-register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/citizen\\-register(?:/)?$"
+    },
+    {
+      "page": "/developer/devices",
+      "regex": "^/developer/devices(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/devices(?:/)?$"
+    },
+    {
+      "page": "/developer/diagnostics",
+      "regex": "^/developer/diagnostics(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/diagnostics(?:/)?$"
+    },
+    {
+      "page": "/developer/edge-queue",
+      "regex": "^/developer/edge\\-queue(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/edge\\-queue(?:/)?$"
+    },
+    {
+      "page": "/developer/health",
+      "regex": "^/developer/health(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/health(?:/)?$"
+    },
+    {
+      "page": "/developer/inject",
+      "regex": "^/developer/inject(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/inject(?:/)?$"
+    },
+    {
+      "page": "/developer/logs",
+      "regex": "^/developer/logs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/logs(?:/)?$"
+    },
+    {
+      "page": "/developer/ml-monitor",
+      "regex": "^/developer/ml\\-monitor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/ml\\-monitor(?:/)?$"
+    },
+    {
+      "page": "/developer/telemetry",
+      "regex": "^/developer/telemetry(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer/telemetry(?:/)?$"
+    },
+    {
+      "page": "/developer-login",
+      "regex": "^/developer\\-login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/developer\\-login(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/municipal/audit",
+      "regex": "^/municipal/audit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/audit(?:/)?$"
+    },
+    {
+      "page": "/municipal/device-status",
+      "regex": "^/municipal/device\\-status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/device\\-status(?:/)?$"
+    },
+    {
+      "page": "/municipal/disposal",
+      "regex": "^/municipal/disposal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/disposal(?:/)?$"
+    },
+    {
+      "page": "/municipal/events",
+      "regex": "^/municipal/events(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/events(?:/)?$"
+    },
+    {
+      "page": "/municipal/lookup",
+      "regex": "^/municipal/lookup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/lookup(?:/)?$"
+    },
+    {
+      "page": "/municipal/previews/collection-journey",
+      "regex": "^/municipal/previews/collection\\-journey(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/previews/collection\\-journey(?:/)?$"
+    },
+    {
+      "page": "/municipal/previews/fleet-map",
+      "regex": "^/municipal/previews/fleet\\-map(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/previews/fleet\\-map(?:/)?$"
+    },
+    {
+      "page": "/municipal/previews/reports",
+      "regex": "^/municipal/previews/reports(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/previews/reports(?:/)?$"
+    },
+    {
+      "page": "/municipal/previews/zones",
+      "regex": "^/municipal/previews/zones(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/previews/zones(?:/)?$"
+    },
+    {
+      "page": "/municipal/scan",
+      "regex": "^/municipal/scan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/scan(?:/)?$"
+    },
+    {
+      "page": "/municipal/verification",
+      "regex": "^/municipal/verification(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal/verification(?:/)?$"
+    },
+    {
+      "page": "/municipal-login",
+      "regex": "^/municipal\\-login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/municipal\\-login(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
